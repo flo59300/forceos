@@ -29,5 +29,6 @@ lb config noauto \
   --iso-publisher "Florian Bigotte pour Force Ouvrière" \
   --iso-volume "ForceOS $FORCEOS_VERSION" \
   --memtest none \
+  --loadlin false \
   --cache-packages true \
   "${@}"
