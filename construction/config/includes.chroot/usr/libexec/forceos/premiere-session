@@ -11,12 +11,16 @@ MARQUEUR=$HOME/.config/forceos/bureau-prepare
 FONDS=/usr/share/backgrounds/forceos
 
 # --- Dossiers personnels en français -----------------------------------------
-xdg-user-dirs-update
+# Noms de dossiers en français, même si la session a démarré dans une autre langue
+LC_ALL=fr_FR.UTF-8 LANG=fr_FR.UTF-8 xdg-user-dirs-update --force
 DOCS=$(xdg-user-dir DOCUMENTS)
 mkdir -p "$DOCS/Bibliothèque_Syndicale" "$DOCS/Documents_IA"
 
 # --- Lanceurs du bureau approuvés (XFCE 4.18 et suivants) ----------------------
 BUREAU=$(xdg-user-dir DESKTOP)
+mkdir -p "$BUREAU"
+# Lanceurs ForceOS copiés dans le vrai dossier du bureau, quel que soit son nom
+cp -n /etc/skel/Bureau/forceos-*.desktop "$BUREAU/" 2>/dev/null
 # Session autonome (clé USB) : icône d'installation sur le bureau. Absente une
 # fois le système installé, car le noyau n'est alors plus lancé avec boot=live.
 if grep -qw 'boot=live' /proc/cmdline; then
