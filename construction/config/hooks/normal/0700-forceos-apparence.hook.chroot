@@ -1,0 +1,54 @@
+#!/bin/sh
+# =====================================================================
+# ForceOS : identité visuelle, navigateur isolé et nettoyage des traces
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -e
+
+# --- Droits des scripts ForceOS ------------------------------------------
+chmod 0755 /usr/bin/forceos-* /usr/libexec/forceos/* /etc/X11/Xsession.d/55forceos-xdg
+chmod 0644 /etc/skel/Bureau/*.desktop 2>/dev/null || true
+chmod 0755 /etc/skel/Bureau/*.desktop
+
+# --- Icônes -------------------------------------------------------------------
+gtk-update-icon-cache -f -q /usr/share/icons/hicolor || true
+
+# --- Démarrage : thème Plymouth ForceOS (logo sur pastille blanche) ---------
+# La phrase de chiffrement du disque est saisie sur cet écran.
+if [ -d /usr/share/plymouth/themes/spinner ]; then
+  rm -rf /usr/share/plymouth/themes/forceos
+  cp -a /usr/share/plymouth/themes/spinner /usr/share/plymouth/themes/forceos
+  mv /usr/share/plymouth/themes/forceos/spinner.plymouth /usr/share/plymouth/themes/forceos/forceos.plymouth
+  # Le fichier d'origine écrit « themes//spinner » : le chemin est réécrit en entier
+  sed -i -e '/^Name\[/d' -e 's/^Name=.*/Name=ForceOS/' \
+         -e 's/^Description=.*/Description=Démarrage ForceOS (Florian Bigotte)/' \
+         -e 's#^ImageDir=.*#ImageDir=/usr/share/plymouth/themes/forceos#' \
+         -e 's/^Font=.*/Font=Carlito 13/' -e 's/^TitleFont=.*/TitleFont=Carlito 28/' \
+         -e 's/^BackgroundStartColor=.*/BackgroundStartColor=0x002B7F/' \
+         -e 's/^BackgroundEndColor=.*/BackgroundEndColor=0x001D57/' \
+         -e 's/^WatermarkVerticalAlignment=.*/WatermarkVerticalAlignment=.2/' \
+         -e 's/^DialogVerticalAlignment=.*/DialogVerticalAlignment=.62/' \
+         -e 's/^TitleVerticalAlignment=.*/TitleVerticalAlignment=.62/' \
+         /usr/share/plymouth/themes/forceos/forceos.plymouth
+  install -m 0644 /usr/share/forceos/images/watermark.png /usr/share/plymouth/themes/forceos/watermark.png
+  plymouth-set-default-theme forceos
+fi
+
+# --- LibreWolf isolé par Firejail ---------------------------------------------
+# /usr/local/bin passe avant /usr/bin : « librewolf » lance Firejail
+ln -sf /usr/bin/firejail /usr/local/bin/librewolf
+if [ -f /usr/share/applications/librewolf.desktop ]; then
+  sed -E 's#^(Exec=)(/usr/bin/)?librewolf#\1/usr/local/bin/librewolf#' \
+    /usr/share/applications/librewolf.desktop > /usr/local/share/applications/librewolf.desktop
+fi
+/usr/libexec/forceos/librewolf-politiques
+update-alternatives --set x-www-browser /usr/bin/librewolf 2>/dev/null || true
+
+# --- Réseau : résolveur filtrant -----------------------------------------------
+systemctl enable forceos-dns.service
+
+# --- Nettoyage des traces à chaque ouverture et fermeture de session ------------
+systemctl --global enable forceos-nettoyage.service
+
+# --- Démarrage : prise en compte du thème ----------------------------------------
+update-initramfs -u -k all || true

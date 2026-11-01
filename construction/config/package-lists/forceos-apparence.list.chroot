@@ -1,0 +1,9 @@
+# ForceOS : paquets de l'étape 7 (apparence et outils), Florian Bigotte
+greybird-gtk-theme
+elementary-xfce-icon-theme
+plymouth
+plymouth-themes
+ocrmypdf
+xdg-utils
+x11-xserver-utils
+gnome-icon-theme

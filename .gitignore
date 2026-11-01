@@ -1,0 +1,11 @@
+application/node_modules/
+application/dist/
+construction/cache/
+construction/*.iso
+construction/*.iso.sha256
+construction/construction.log
+construction/config/packages.chroot/*.deb
+__pycache__/
+# Fiches internes à l'entreprise : jamais dans ce dépôt public
+construction/config/includes.chroot/etc/skel/Documents/Documents_IA/*.docx
+construction/config/includes.chroot/etc/skel/Documents/Documents_IA/*.pdf

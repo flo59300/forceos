@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : coffre-fort chiffré du militant (partie root, via pkexec)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+#   coffre-racine etat
+#   coffre-racine creer <taille en Go>   (phrase de passe sur l'entrée standard)
+#   coffre-racine ouvrir                 (phrase de passe sur l'entrée standard)
+#   coffre-racine fermer [force]
+#
+# Le coffre est un fichier ~/.coffre-fo.luks (LUKS2, argon2id) monté sur
+# ~/Coffre-FO. Il s'ajoute au chiffrement du disque entier : un poste
+# allumé et laissé ouvert ne donne pas accès au coffre fermé.
+# La phrase de passe n'apparaît jamais sur la ligne de commande.
+# =====================================================================
+set -euo pipefail
+umask 077
+[[ -n ${PKEXEC_UID:-} ]] || { echo "À lancer par pkexec." >&2; exit 2; }
+UTIL=$(getent passwd "$PKEXEC_UID" | cut -d: -f1)
+MAISON=$(getent passwd "$PKEXEC_UID" | cut -d: -f6)
+[[ -n $UTIL && -d $MAISON ]] || { echo "Compte inconnu." >&2; exit 2; }
+IMAGE=$MAISON/.coffre-fo.luks
+POINT=$MAISON/Coffre-FO
+CARTE=forceos-coffre-$PKEXEC_UID
+
+est_ouvert() { [[ -e /dev/mapper/$CARTE ]]; }
+est_monte() { findmnt -rn --target "$POINT" -o SOURCE 2>/dev/null | grep -qx "/dev/mapper/$CARTE"; }
+
+# L'image doit être un vrai fichier appartenant au militant (pas un lien
+# vers un disque du système) ; le périphérique de boucle est contrôlé
+# après coup pour écarter toute substitution entre-temps.
+attacher() {
+  [[ -f $IMAGE && ! -L $IMAGE ]] || { echo "Coffre introuvable." >&2; exit 3; }
+  [[ $(stat -c %u "$IMAGE") == "$PKEXEC_UID" ]] || { echo "Le fichier du coffre n'appartient pas à ce compte." >&2; exit 3; }
+  local ino boucle
+  ino=$(stat -c %i "$IMAGE")
+  boucle=$(losetup --find --show --nooverlap "$IMAGE")
+  if [[ $(losetup -nO BACK-INO "$boucle" | tr -d ' ') != "$ino" ]]; then
+    losetup -d "$boucle"; echo "Fichier du coffre modifié pendant l'ouverture." >&2; exit 3
+  fi
+  echo "$boucle"
+}
+
+phrase() {   # lit la phrase de passe sur l'entrée standard, sans retour à la ligne
+  local p; IFS= read -r p || true
+  (( ${#p} >= 12 )) || { echo "La phrase de passe doit compter au moins 12 caractères." >&2; exit 4; }
+  printf '%s' "$p"
+}
+
+monter() {
+  install -d -o "$UTIL" -g "$UTIL" -m 0700 "$POINT"
+  fsck.ext4 -p "/dev/mapper/$CARTE" >/dev/null 2>&1 || true
+  mount -o nodev,nosuid,noexec "/dev/mapper/$CARTE" "$POINT"
+  chown "$UTIL:$UTIL" "$POINT"; chmod 0700 "$POINT"
+}
+
+fermer() {
+  local force=${1:-}
+  if est_monte; then
+    sync
+    if ! umount "$POINT" 2>/dev/null; then
+      [[ $force == force ]] || { echo "Des fichiers du coffre sont encore ouverts : fermez-les d'abord." >&2; exit 5; }
+      fuser -km "$POINT" 2>/dev/null || true
+      sleep 1
+      umount "$POINT" 2>/dev/null || umount -l "$POINT"
+    fi
+  fi
+  if est_ouvert; then
+    local boucle
+    boucle=$(cryptsetup status "$CARTE" | awk '$1=="device:"{print $2}')
+    cryptsetup close "$CARTE"
+    [[ $boucle == /dev/loop* ]] && losetup -d "$boucle" 2>/dev/null || true
+  fi
+}
+
+case ${1:-} in
+  etat)
+    if [[ ! -f $IMAGE ]]; then echo absent
+    elif est_monte; then echo ouvert
+    else echo ferme; fi ;;
+
+  creer)
+    [[ ! -e $IMAGE ]] || { echo "Un coffre existe déjà." >&2; exit 3; }
+    TAILLE=${2:-}
+    [[ $TAILLE =~ ^(1|2|5|10|20)$ ]] || { echo "Taille invalide." >&2; exit 2; }
+    LIBRE=$(df --output=avail -BG "$MAISON" | tail -1 | tr -dc 0-9)
+    (( LIBRE > TAILLE + 2 )) || { echo "Pas assez de place sur le disque." >&2; exit 6; }
+    P=$(phrase)
+    fallocate -l "${TAILLE}G" "$IMAGE"
+    chown "$UTIL:$UTIL" "$IMAGE"; chmod 0600 "$IMAGE"
+    BOUCLE=$(attacher)
+    # En cas d'échec, rien ne reste : ni coffre à moitié créé, ni périphérique attaché
+    trap '{ cryptsetup close "$CARTE" || true; losetup -d "$BOUCLE" || true; rm -f "$IMAGE"; } 2>/dev/null' ERR
+    printf '%s' "$P" | cryptsetup luksFormat --batch-mode --type luks2 --pbkdf argon2id \
+      --label "Coffre-FO" --key-file=- "$BOUCLE"
+    printf '%s' "$P" | cryptsetup open --key-file=- "$BOUCLE" "$CARTE"
+    mkfs.ext4 -q -m 0 -L Coffre-FO "/dev/mapper/$CARTE"
+    trap - ERR
+    monter
+    echo ouvert ;;
+
+  ouvrir)
+    if est_monte; then echo ouvert; exit 0; fi
+    P=$(phrase)
+    BOUCLE=$(attacher)
+    if ! printf '%s' "$P" | cryptsetup open --key-file=- "$BOUCLE" "$CARTE" 2>/dev/null; then
+      losetup -d "$BOUCLE"
+      echo "Phrase de passe incorrecte." >&2; exit 7
+    fi
+    monter
+    echo ouvert ;;
+
+  fermer)
+    fermer "${2:-}"
+    echo ferme ;;
+
+  *) echo "Usage : coffre-racine etat|creer <Go>|ouvrir|fermer [force]" >&2; exit 2 ;;
+esac

@@ -1,0 +1,41 @@
+#!/bin/sh
+# =====================================================================
+# ForceOS : droits des outils système, polkit, clés USB
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -e
+
+# Outils lancés par root (via pkexec) : propriété root, non modifiables
+chown root:root /usr/libexec/forceos/*
+chmod 0755 /usr/libexec/forceos/* /usr/bin/forceos-*
+chmod 0644 /usr/share/polkit-1/actions/fr.force-ouvriere.forceos.policy
+chmod 0644 /etc/polkit-1/rules.d/49-forceos.rules
+chmod 0644 /etc/udev/rules.d/80-forceos-usb.rules
+
+# Configuration ForceOS lisible par tous, modifiable par root seulement
+chown -R root:root /etc/forceos
+find /etc/forceos -type d -exec chmod 0755 {} +
+find /etc/forceos -type f -exec chmod 0644 {} +
+touch /etc/forceos/usb-autorisees
+chmod 0644 /etc/forceos/usb-autorisees
+
+# Les journaux du noyau ne sont pas lisibles par le militant
+echo 'kernel.dmesg_restrict = 1' > /etc/sysctl.d/40-forceos-dmesg.conf
+
+# Comptes : la session « live » ne laisse pas de droits sudo sans mot de passe
+rm -f /etc/sudoers.d/live
+
+# PHP2Shell (CVE-2026-109618 et CVE-2026-109619) : l'image n'est jamais
+# construite avec un PHP non corrigé (DSA-6574-1, php8.4 8.4.27-1~deb13u1).
+for p in php8.4-cli php8.4-cgi; do
+  v=$(dpkg-query -W -f='${Version}' "$p" 2>/dev/null || true)
+  if [ -z "$v" ] || ! dpkg --compare-versions "$v" ge "8.4.27-1~deb13u1"; then
+    echo "ERREUR : $p ${v:-absent} est exposé à PHP2Shell ; vérifier que le dépôt de sécurité Debian est bien utilisé." >&2
+    exit 1
+  fi
+done
+# Configuration système de PHP : suivi de progression des envois désactivé
+# pour tout script PHP du poste, pas seulement pour FO Gestion
+for d in /etc/php/8.4/cli/conf.d /etc/php/8.4/cgi/conf.d; do
+  [ -d "$d" ] && printf '; ForceOS : PHP2Shell (Florian Bigotte)\nsession.upload_progress.enabled = 0\n' > "$d/99-forceos-php2shell.ini"
+done

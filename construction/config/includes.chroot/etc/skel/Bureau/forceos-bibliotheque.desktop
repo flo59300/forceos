@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Bibliothèque syndicale
+Comment=Livres numériques du syndicat (Foliate)
+Exec=forceos-dossier bibliotheque
+Icon=accessories-dictionary
+Terminal=false
+StartupNotify=true

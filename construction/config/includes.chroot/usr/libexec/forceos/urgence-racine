@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : partie root du verrouillage d'urgence (via pkexec)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -u
+[[ -n ${PKEXEC_UID:-} ]] || exit 2
+logger -t forceos-urgence "Verrouillage d'urgence déclenché"
+# Coffre-fort refermé de force (les programmes qui l'utilisent sont arrêtés)
+/usr/libexec/forceos/coffre-racine fermer force >/dev/null 2>&1
+# Assistance à distance coupée
+/usr/libexec/forceos/support-fermer >/dev/null 2>&1
+# Caches de fichiers vidés : les documents lus récemment ne restent pas en mémoire
+sync
+echo 3 > /proc/sys/vm/drop_caches
+exit 0

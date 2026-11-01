@@ -1,0 +1,16 @@
+// ForceOS : mises à jour de sécurité Debian automatiques (Florian Bigotte)
+// Les fichiers de configuration modifiés par ForceOS sont toujours conservés.
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";
+Unattended-Upgrade::Origins-Pattern {
+  "origin=Debian,codename=${distro_codename},label=Debian-Security";
+  "origin=Debian,codename=${distro_codename}-security,label=Debian-Security";
+  "origin=Debian,codename=${distro_codename}-updates";
+  "site=deb.librewolf.net";
+  "site=repo.librewolf.net";
+};
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Automatic-Reboot "false";
+Unattended-Upgrade::OnlyOnACPower "false";
+Dpkg::Options { "--force-confdef"; "--force-confold"; };

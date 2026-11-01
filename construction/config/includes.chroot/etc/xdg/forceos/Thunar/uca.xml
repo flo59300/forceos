@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ForceOS : actions du clic droit dans le gestionnaire de fichiers (Florian Bigotte) -->
+<actions>
+  <action>
+    <icon>security-high</icon>
+    <name>Analyser avec l'antivirus</name>
+    <submenu></submenu>
+    <unique-id>forceos-antivirus</unique-id>
+    <command>clamtk %F</command>
+    <description>Rechercher des virus dans les fichiers ou la clé USB sélectionnés (ClamAV)</description>
+    <range></range>
+    <patterns>*</patterns>
+    <directories/>
+    <audio-files/>
+    <image-files/>
+    <other-files/>
+    <text-files/>
+    <video-files/>
+  </action>
+  <action>
+    <icon>document-edit-symbolic</icon>
+    <name>Rendre le PDF consultable (OCR)</name>
+    <submenu></submenu>
+    <unique-id>forceos-ocr-pdf</unique-id>
+    <command>forceos-ocr-pdf %F</command>
+    <description>Reconnaître le texte d'un PDF scanné, en français, pour pouvoir le rechercher et le copier</description>
+    <range></range>
+    <patterns>*.pdf;*.PDF</patterns>
+    <other-files/>
+  </action>
+  <action>
+    <icon>accessories-dictionary</icon>
+    <name>Ajouter aux documents de l'IA</name>
+    <submenu></submenu>
+    <unique-id>forceos-documents-ia</unique-id>
+    <command>forceos-ajouter-documents-ia %F</command>
+    <description>Copier dans Documents_IA pour que l'assistant de FO Gestion puisse le consulter</description>
+    <range></range>
+    <patterns>*.pdf;*.PDF;*.docx;*.odt;*.txt;*.md</patterns>
+    <other-files/>
+    <text-files/>
+  </action>
+</actions>

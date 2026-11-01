@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : préparation du bureau à la première ouverture de session
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Exécuté une seule fois par compte (marqueur dans ~/.config/forceos).
+# Chaque réglage est indépendant : un échec n'empêche pas les suivants.
+# =====================================================================
+MARQUEUR=$HOME/.config/forceos/bureau-prepare
+[[ -f $MARQUEUR ]] && exit 0
+FONDS=/usr/share/backgrounds/forceos
+
+# --- Dossiers personnels en français -----------------------------------------
+xdg-user-dirs-update
+DOCS=$(xdg-user-dir DOCUMENTS)
+mkdir -p "$DOCS/Bibliothèque_Syndicale" "$DOCS/Documents_IA"
+
+# --- Lanceurs du bureau approuvés (XFCE 4.18 et suivants) ----------------------
+BUREAU=$(xdg-user-dir DESKTOP)
+for f in "$BUREAU"/forceos-*.desktop; do
+  [[ -f $f ]] || continue
+  chmod u+x "$f"
+  gio set -t string "$f" metadata::xfce-exe-checksum "$(sha256sum "$f" | cut -d' ' -f1)"
+done
+
+# --- Attente du gestionnaire de bureau et du tableau de bord -----------------
+for _ in $(seq 1 30); do
+  pgrep -u "$UID" -x xfdesktop >/dev/null && pgrep -u "$UID" -x xfce4-panel >/dev/null && break
+  sleep 1
+done
+sleep 2
+
+# --- Fond d'écran sur chaque écran branché -----------------------------------
+while read -r nom largeur; do
+  [[ -n $nom ]] || continue
+  image=$FONDS/forceos-fond-1920x1080.png
+  (( largeur > 2560 )) && image=$FONDS/forceos-fond-3840x2160.png
+  for ws in 0 1; do
+    base=/backdrop/screen0/monitor$nom/workspace$ws
+    xfconf-query -c xfce4-desktop -p "$base/last-image" -n -t string -s "$image"
+    xfconf-query -c xfce4-desktop -p "$base/image-style" -n -t int -s 5   # zoom
+  done
+done < <(xrandr --listmonitors 2>/dev/null | awk 'NR>1 {split($3,d,"/"); print $NF, d[1]}')
+
+# --- Tableau de bord en bleu Force Ouvrière ----------------------------------
+for p in $(xfconf-query -c xfce4-panel -l 2>/dev/null | grep -oE '^/panels/panel-[0-9]+' | sort -u); do
+  xfconf-query -c xfce4-panel -p "$p/background-style" -n -t uint -s 1
+  xfconf-query -c xfce4-panel -p "$p/background-rgba" -n \
+    -t double -t double -t double -t double -s 0.0 -s 0.1686 -s 0.4980 -s 1.0
+done
+
+# --- Raccourci discret du bouton d'urgence : Ctrl + Alt + Pause --------------
+xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Primary><Alt>Pause' -n -t string -s forceos-urgence
+# Verrouillage classique : Super + L
+xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Super>l' -n -t string -s 'xfce4-screensaver-command --lock'
+
+mkdir -p "$(dirname "$MARQUEUR")"
+touch "$MARQUEUR"

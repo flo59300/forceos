@@ -1,0 +1,32 @@
+# =====================================================================
+# ForceOS : MariaDB réservée à FO Gestion, sur ce poste uniquement
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+[mariadb]
+# Aucun port réseau : accès par le seul socket local, authentifié par le
+# compte Linux (unix_socket). Doublé par PrivateNetwork côté systemd.
+skip-networking
+bind-address            = 127.0.0.1
+socket                  = /run/mysqld/mysqld.sock
+
+character-set-server    = utf8mb4
+collation-server        = utf8mb4_unicode_ci
+sql-mode                = STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+
+# Pas de lecture ni d'écriture de fichiers arbitraires par SQL : LOAD DATA
+# LOCAL est coupé, et le compte du militant n'a pas le droit FILE (ses droits
+# se limitent à la base forceos_gestion)
+local-infile            = 0
+symbolic-links          = 0
+
+# Poste de bureau : mémoire modeste, écritures sûres
+innodb_buffer_pool_size = 128M
+innodb_log_file_size    = 64M
+innodb_flush_log_at_trx_commit = 1
+max_connections         = 30
+performance_schema      = OFF
+
+# Journaux : erreurs seulement, jamais les requêtes (données personnelles)
+general_log             = 0
+slow_query_log          = 0
+log_error               = /var/log/mysql/error.log

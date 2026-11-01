@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : coffre-fort FO (créer, ouvrir, fermer)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -u
+TITRE="Coffre-fort FO"
+AIDE=/usr/libexec/forceos/coffre-racine
+POINT=$HOME/Coffre-FO
+erreur() { zenity --error --title="$TITRE" --width=420 --text="$1"; exit 1; }
+
+ETAT=$(pkexec "$AIDE" etat 2>/dev/null) || erreur "Le coffre-fort est inaccessible."
+
+case $ETAT in
+  absent)
+    zenity --question --title="$TITRE" --width=480 --ok-label="Créer le coffre" --cancel-label="Annuler" \
+      --text="Vous n'avez pas encore de coffre-fort.\n\nLe coffre est un espace chiffré pour les documents sensibles (dossiers d'adhérents, courriers confidentiels). Il reste illisible tant qu'il est fermé, même si l'ordinateur est volé allumé.\n\n<b>Retenez bien sa phrase de passe : sans elle, personne, pas même Florian, ne pourra récupérer son contenu.</b>" || exit 0
+    TAILLE=$(zenity --list --radiolist --title="$TITRE" --text="Taille du coffre :" --width=360 --height=300 \
+      --column="" --column=Go --column=Usage \
+      FALSE 1 "Quelques centaines de documents" TRUE 2 "Usage courant" FALSE 5 "Avec photos et scans" FALSE 10 "Archives importantes" \
+      --print-column=2) || exit 0
+    while :; do
+      P=$(zenity --forms --title="$TITRE" --text="Phrase de passe du coffre (12 caractères au moins)" \
+        --add-password="Phrase de passe" --add-password="Confirmation" --separator=$'\n') || exit 0
+      P1=$(sed -n 1p <<<"$P"); P2=$(sed -n 2p <<<"$P")
+      if [[ $P1 != "$P2" ]]; then zenity --warning --title="$TITRE" --text="Les deux saisies sont différentes."; continue; fi
+      if (( ${#P1} < 12 )); then zenity --warning --title="$TITRE" --text="La phrase de passe doit compter au moins 12 caractères."; continue; fi
+      break
+    done
+    TMPD=$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/coffre.XXXXXX")
+    ( printf '%s\n' "$P1" | pkexec "$AIDE" creer "$TAILLE" >/dev/null 2>"$TMPD/err"; echo $? > "$TMPD/code" ) \
+      | zenity --progress --pulsate --auto-close --no-cancel --title="$TITRE" --text="Création du coffre chiffré..."
+    CODE=$(cat "$TMPD/code" 2>/dev/null); ERR=$(cat "$TMPD/err" 2>/dev/null); rm -rf "$TMPD"
+    if [[ $CODE == 0 ]]; then
+      xdg-open "$POINT" >/dev/null 2>&1 &
+    else
+      erreur "Le coffre n'a pas pu être créé.\n\n${ERR}"
+    fi ;;
+
+  ferme)
+    P=$(zenity --password --title="$TITRE : ouverture") || exit 0
+    if ERR=$(printf '%s\n' "$P" | pkexec "$AIDE" ouvrir 2>&1 >/dev/null); then
+      notify-send -i security-high "$TITRE" "Coffre ouvert. Pensez à le fermer en partant."
+      xdg-open "$POINT" >/dev/null 2>&1 &
+    else
+      erreur "${ERR:-Ouverture impossible.}"
+    fi ;;
+
+  ouvert)
+    CHOIX=$(zenity --list --title="$TITRE" --text="Le coffre est ouvert." --width=360 --height=220 \
+      --column=Action "Afficher le contenu" "Fermer le coffre") || exit 0
+    case $CHOIX in
+      "Afficher le contenu") xdg-open "$POINT" >/dev/null 2>&1 & ;;
+      "Fermer le coffre")
+        if ERR=$(pkexec "$AIDE" fermer 2>&1 >/dev/null); then
+          notify-send -i security-high "$TITRE" "Coffre fermé."
+        else
+          erreur "${ERR:-Fermeture impossible.}"
+        fi ;;
+    esac ;;
+esac

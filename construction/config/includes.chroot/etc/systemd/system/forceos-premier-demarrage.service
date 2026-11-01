@@ -1,0 +1,20 @@
+# =====================================================================
+# ForceOS : préparation au premier démarrage après installation
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# Crée la base de FO Gestion pour le compte autorisé, puis se désactive.
+# =====================================================================
+[Unit]
+Description=ForceOS : préparation au premier démarrage
+After=mariadb.service
+Requires=mariadb.service
+ConditionPathExists=/etc/forceos/utilisateur-autorise
+ConditionPathExists=!/var/lib/forceos/premier-demarrage-fait
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/forceos/db-provisionner
+ExecStartPost=/bin/sh -c 'mkdir -p /var/lib/forceos && touch /var/lib/forceos/premier-demarrage-fait'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

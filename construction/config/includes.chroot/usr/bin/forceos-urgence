@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : verrouillage d'urgence (bouton panique)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# En quelques secondes et sans question : écran verrouillé, FO Gestion
+# fermée (clé de chiffrement effacée de la mémoire), applications de
+# documents fermées, coffre-fort refermé, assistance coupée.
+# =====================================================================
+set -u
+APPLICATIONS="librewolf soffice.bin scribus evince"
+ACTION_FINALE=verrouiller
+# shellcheck source=/dev/null
+[[ -r /etc/forceos/urgence.conf ]] && . /etc/forceos/urgence.conf
+
+# 1. Plus rien de visible à l'écran
+xfce4-screensaver-command --lock >/dev/null 2>&1 &
+
+# 2. FO Gestion : signal prévu par l'application (arrêt de PHP, sortie immédiate).
+#    Seul le processus principal est visé, pas ses processus de rendu.
+for pid in $(pgrep -u "$UID" -f '/opt/FO Gestion/forceos-fo-gestion'); do
+  tr '\0' ' ' < "/proc/$pid/cmdline" 2>/dev/null | grep -q -- '--type=' || kill -USR2 "$pid" 2>/dev/null
+done
+
+# 3. Applications de documents
+for app in $APPLICATIONS; do
+  pkill -KILL -u "$UID" -x "$app" 2>/dev/null
+done
+
+# 4. Coffre-fort et assistance (root, sans mot de passe pour la session active)
+pkexec /usr/libexec/forceos/urgence-racine >/dev/null 2>&1
+
+# 5. Ce qui reste de FO Gestion après 2 secondes est arrêté de force
+sleep 2
+pkill -KILL -u "$UID" -f '/opt/FO Gestion/forceos-fo-gestion' 2>/dev/null
+
+if [[ $ACTION_FINALE == eteindre ]]; then
+  systemctl poweroff
+fi
+exit 0

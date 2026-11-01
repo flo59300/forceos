@@ -1,0 +1,115 @@
+# =====================================================================
+# ForceOS : paquets Debian du système (étapes 2 à 6)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# Les paquets d'apparence et d'outils de l'étape 7 sont dans
+# forceos-apparence.list.chroot ; FO Gestion et RustDesk dans
+# config/packages.chroot (copiés par construire.sh).
+# =====================================================================
+
+# --- Base et matériel ---
+linux-image-amd64
+firmware-linux-free
+firmware-misc-nonfree
+firmware-iwlwifi
+firmware-realtek
+intel-microcode
+amd64-microcode
+cryptsetup
+cryptsetup-initramfs
+lvm2
+systemd-zram-generator
+locales
+console-setup
+keyboard-configuration
+tzdata
+sudo
+
+# --- Bureau XFCE ---
+xorg
+xfce4
+xfce4-goodies
+xfce4-screensaver
+lightdm
+lightdm-gtk-greeter
+network-manager-gnome
+pipewire-audio
+pavucontrol
+gvfs-backends
+udisks2
+thunar-archive-plugin
+xdg-user-dirs
+zenity
+libnotify-bin
+fonts-crosextra-carlito
+fonts-crosextra-caladea
+fonts-dejavu
+fonts-noto-color-emoji
+
+# --- Français uniquement ---
+task-french
+task-french-desktop
+libreoffice-l10n-fr
+libreoffice-help-fr
+hunspell-fr
+hyphen-fr
+mythes-fr
+manpages-fr
+
+# --- Bureautique et documents ---
+libreoffice-writer
+libreoffice-calc
+libreoffice-impress
+libreoffice-gtk3
+scribus
+evince
+foliate
+ristretto
+pdfarranger
+poppler-utils
+tesseract-ocr
+tesseract-ocr-fra
+ffmpeg
+vlc
+simple-scan
+
+# --- Impression ---
+cups
+cups-browsed
+printer-driver-all
+system-config-printer
+avahi-daemon
+
+# --- Sécurité ---
+nftables
+firejail
+firejail-profiles
+clamav
+clamtk
+clamav-freshclam
+apparmor
+apparmor-profiles
+apparmor-utils
+unattended-upgrades
+apt-listchanges
+pkexec
+mate-polkit
+gnome-keyring
+libpam-gnome-keyring
+gnupg
+gpgv
+
+# --- FO Gestion (dépendances aussi déclarées par son paquet) ---
+mariadb-server
+php-cli
+php-cgi
+php-mysql
+php-curl
+php-gd
+php-imagick
+php-intl
+php-mbstring
+php-xml
+php-zip
+
+# --- Navigateur (dépôt LibreWolf activé par le crochet 0100) ---
+extrepo

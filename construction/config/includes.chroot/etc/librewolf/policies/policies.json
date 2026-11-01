@@ -1,0 +1,78 @@
+{
+  "policies": {
+    "BlockAboutConfig": true,
+    "BlockAboutAddons": true,
+    "BlockAboutProfiles": true,
+    "BlockAboutSupport": true,
+    "DisableDeveloperTools": true,
+    "DisableProfileImport": true,
+    "DisableSetDesktopBackground": true,
+    "DNSOverHTTPS": {
+      "Enabled": false,
+      "Locked": true
+    },
+    "Proxy": {
+      "Mode": "none",
+      "Locked": true
+    },
+    "RequestedLocales": [
+      "fr"
+    ],
+    "Homepage": {
+      "URL": "https://www.force-ouvriere.fr/",
+      "StartPage": "homepage",
+      "Locked": false
+    },
+    "SearchEngines": {
+      "Add": [
+        {
+          "Name": "DuckDuckGo protégé",
+          "URLTemplate": "https://duckduckgo.com/?q={searchTerms}&kp=1&kl=fr-fr",
+          "Method": "GET",
+          "Alias": "@ddg",
+          "Description": "Recherche DuckDuckGo avec filtrage strict (ForceOS)"
+        }
+      ],
+      "Default": "DuckDuckGo protégé",
+      "PreventInstalls": true
+    },
+    "ExtensionSettings": {
+      "*": {
+        "installation_mode": "blocked",
+        "blocked_install_message": "L’installation d’extensions est désactivée sur ForceOS. Contactez Florian Bigotte."
+      },
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+      }
+    },
+    "SanitizeOnShutdown": {
+      "Cache": true,
+      "Cookies": true,
+      "Downloads": true,
+      "FormData": true,
+      "History": true,
+      "Sessions": true,
+      "SiteSettings": false,
+      "Locked": true
+    },
+    "Preferences": {
+      "network.trr.mode": {
+        "Value": 5,
+        "Status": "locked"
+      },
+      "intl.locale.requested": {
+        "Value": "fr",
+        "Status": "locked"
+      },
+      "browser.download.useDownloadDir": {
+        "Value": false,
+        "Status": "default"
+      },
+      "media.peerconnection.enabled": {
+        "Value": false,
+        "Status": "locked"
+      }
+    }
+  }
+}

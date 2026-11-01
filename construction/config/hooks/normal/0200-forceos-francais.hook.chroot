@@ -1,0 +1,23 @@
+#!/bin/sh
+# =====================================================================
+# ForceOS : système entièrement en français
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -e
+sed -i 's/^# *fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
+locale-gen
+update-locale LANG=fr_FR.UTF-8 LANGUAGE=fr_FR:fr
+cat > /etc/default/keyboard <<'K'
+XKBMODEL="pc105"
+XKBLAYOUT="fr"
+XKBVARIANT="latin9"
+XKBOPTIONS=""
+BACKSPACE="guess"
+K
+ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+echo Europe/Paris > /etc/timezone
+
+# Traductions déjà installées avant la règle dpkg : supprimées une fois
+find /usr/share/locale -mindepth 1 -maxdepth 1 -type d \
+  ! -name fr ! -name fr_FR ! -name en -exec rm -rf {} +
+find /usr/share/man -mindepth 1 -maxdepth 1 -type d ! -name 'man[1-9]' ! -name fr -exec rm -rf {} +

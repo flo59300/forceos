@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : fermeture de la session d'assistance (root)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -u
+nft flush set inet forceos support_v4 2>/dev/null
+nft flush set inet forceos support_v6 2>/dev/null
+systemctl stop rustdesk.service 2>/dev/null
+systemctl stop forceos-support-fin.timer 2>/dev/null
+pkill -KILL -x rustdesk 2>/dev/null
+logger -t forceos-support "Assistance fermée"
+exit 0

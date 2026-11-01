@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# ForceOS : ouvre un dossier syndical du militant (Florian Bigotte)
+# Usage : forceos-dossier bibliotheque | documents-ia
+DOCS=$(xdg-user-dir DOCUMENTS)
+case ${1:-} in
+  bibliotheque) d="$DOCS/Bibliothèque_Syndicale" ;;
+  documents-ia) d="$DOCS/Documents_IA" ;;
+  *) echo "Usage : forceos-dossier bibliotheque|documents-ia" >&2; exit 1 ;;
+esac
+mkdir -p "$d" && exec xdg-open "$d"

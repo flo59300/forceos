@@ -1,0 +1,27 @@
+# =====================================================================
+# ForceOS : seules les traductions et pages de manuel françaises sont
+# installées (gain d'environ 400 Mo). Placé avant l'installation des
+# paquets, il s'applique aussi à toutes les mises à jour futures.
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+path-exclude=/usr/share/locale/*
+path-include=/usr/share/locale/fr/*
+path-include=/usr/share/locale/fr_FR/*
+path-include=/usr/share/locale/locale.alias
+path-include=/usr/share/locale/en/*
+
+path-exclude=/usr/share/man/*
+path-include=/usr/share/man/man[1-9]/*
+path-include=/usr/share/man/fr/*
+
+path-exclude=/usr/share/help/*
+path-include=/usr/share/help/C/*
+path-include=/usr/share/help/fr/*
+
+path-exclude=/usr/share/doc/*
+path-include=/usr/share/doc/*/copyright
+
+path-exclude=/usr/share/qt6/translations/*
+path-include=/usr/share/qt6/translations/*_fr.qm
+path-exclude=/usr/share/qt5/translations/*
+path-include=/usr/share/qt5/translations/*_fr.qm

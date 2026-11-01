@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!-- ForceOS : actions système autorisées depuis la session du militant.
+     Conçu et développé par Florian Bigotte pour Force Ouvrière.
+     « yes » : sans mot de passe (le militant a déjà ouvert sa session) ;
+     « auth_admin » : mot de passe administrateur (root, gardé par Florian). -->
+<policyconfig>
+  <vendor>Force Ouvrière : ForceOS</vendor>
+  <icon_name>forceos</icon_name>
+  <action id="fr.force-ouvriere.forceos.coffre">
+    <description>Ouvrir ou fermer le coffre-fort FO</description>
+    <message>Le coffre-fort FO doit être ouvert ou fermé.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/coffre-racine</annotate>
+  </action>
+  <action id="fr.force-ouvriere.forceos.urgence">
+    <description>Verrouillage d'urgence</description>
+    <message>Le poste doit être verrouillé en urgence.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/urgence-racine</annotate>
+  </action>
+  <action id="fr.force-ouvriere.forceos.support-ouvrir">
+    <description>Ouvrir une session d'assistance</description>
+    <message>Florian Bigotte va pouvoir prendre la main sur ce poste.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/support-ouvrir</annotate>
+  </action>
+  <action id="fr.force-ouvriere.forceos.support-fermer">
+    <description>Fermer la session d'assistance</description>
+    <message>La session d'assistance doit être fermée.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/support-fermer</annotate>
+  </action>
+  <action id="fr.force-ouvriere.forceos.prompts">
+    <description>Modifier les consignes de l'assistant IA</description>
+    <message>La modification des consignes de l'IA demande le mot de passe administrateur.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/ecrire-prompts</annotate>
+  </action>
+  <action id="fr.force-ouvriere.forceos.usb">
+    <description>Autoriser une clé USB</description>
+    <message>L'autorisation d'une nouvelle clé USB demande le mot de passe administrateur.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/usb-autoriser-racine</annotate>
+  </action>
+</policyconfig>

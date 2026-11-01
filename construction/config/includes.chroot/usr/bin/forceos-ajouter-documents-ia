@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# ForceOS : copie des documents vers Documents_IA (Florian Bigotte)
+# FO Gestion les indexe au prochain démarrage ou via « Mettre à jour » dans l'assistant.
+DEST="$(xdg-user-dir DOCUMENTS)/Documents_IA"; mkdir -p "$DEST"
+n=0
+for f in "$@"; do [[ -f $f ]] && cp -n -- "$f" "$DEST/" && n=$((n + 1)); done
+zenity --notification --text="$n document(s) ajouté(s) aux documents de l'IA." 2>/dev/null &

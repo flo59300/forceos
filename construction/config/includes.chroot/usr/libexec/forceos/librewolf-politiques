@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : application des politiques LibreWolf (Florian Bigotte)
+#
+# Les politiques ForceOS vivent dans /etc/librewolf/policies/. Par
+# précaution, elles sont aussi fusionnées dans le fichier de politiques
+# livré avec LibreWolf (dossier « distribution »), quel que soit l'endroit
+# que LibreWolf lit en priorité. Relancé après chaque mise à jour du paquet.
+# =====================================================================
+set -euo pipefail
+NOTRE=/etc/librewolf/policies/policies.json
+[[ -f $NOTRE ]] || exit 0
+for d in /usr/share/librewolf/distribution /usr/lib/librewolf/distribution /opt/librewolf/distribution; do
+  [[ -d $(dirname "$d") ]] || continue
+  mkdir -p "$d"
+  cible=$d/policies.json
+  [[ -f $cible ]] || echo '{"policies":{}}' > "$cible"
+  # Fusion profonde : les réglages ForceOS l'emportent sur ceux de LibreWolf
+  tmp=$(mktemp)
+  jq -s '.[0] * .[1]' "$cible" "$NOTRE" > "$tmp"
+  install -m 0644 -o root -g root "$tmp" "$cible"
+  rm -f "$tmp"
+done

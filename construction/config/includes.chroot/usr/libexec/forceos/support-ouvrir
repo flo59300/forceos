@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : ouverture d'une session d'assistance (root, via pkexec)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Le pare-feu n'ouvre RustDesk que vers le serveur de Florian, pour une
+# durée limitée ; le service RustDesk n'est démarré que pendant ce temps.
+# =====================================================================
+set -euo pipefail
+# shellcheck source=/dev/null
+. /etc/forceos/support.conf
+[[ -n ${SERVEUR:-} && -n ${CLE:-} ]] || { echo "Le serveur d'assistance n'est pas configuré." >&2; exit 2; }
+[[ $SERVEUR =~ ^[A-Za-z0-9.:-]+$ && $CLE =~ ^[A-Za-z0-9+/=]+$ ]] || { echo "Configuration d'assistance invalide." >&2; exit 2; }
+DUREE=${DUREE_MAX_MINUTES:-120}
+[[ $DUREE =~ ^[0-9]+$ ]] && (( DUREE >= 5 && DUREE <= 480 )) || DUREE=120
+
+# Adresses du serveur, résolues par le DNS filtrant
+mapfile -t V4 < <(getent ahostsv4 "$SERVEUR" | awk '{print $1}' | sort -u)
+mapfile -t V6 < <(getent ahostsv6 "$SERVEUR" | awk '$1 !~ /^::ffff:/ {print $1}' | sort -u)
+(( ${#V4[@]} + ${#V6[@]} > 0 )) || { echo "Le serveur d'assistance est injoignable (pas de réseau ?)." >&2; exit 3; }
+for a in "${V4[@]}"; do nft add element inet forceos support_v4 "{ $a timeout ${DUREE}m }"; done
+for a in "${V6[@]}"; do nft add element inet forceos support_v6 "{ $a timeout ${DUREE}m }"; done
+
+# Configuration du service RustDesk (compte root)
+install -d -m 0700 /root/.config/rustdesk
+cat > /root/.config/rustdesk/RustDesk2.toml <<TOML
+rendezvous_server = '$SERVEUR:21116'
+
+[options]
+custom-rendezvous-server = '$SERVEUR'
+relay-server = '$SERVEUR'
+key = '$CLE'
+direct-server = 'N'
+enable-file-transfer = 'Y'
+TOML
+systemctl start rustdesk.service
+
+# Fermeture automatique à l'échéance, même si le militant oublie
+systemd-run --quiet --unit=forceos-support-fin --on-active="${DUREE}m" \
+  /usr/libexec/forceos/support-fermer 2>/dev/null || true
+logger -t forceos-support "Assistance ouverte pour $DUREE minutes vers $SERVEUR"
+echo "$DUREE"

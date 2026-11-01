@@ -1,0 +1,1 @@
+<?= view('errors/_page', ['code' => 503, 'title' => 'Maintenance en cours', 'message' => 'L’application est momentanément indisponible, le temps d’une mise à jour ou d’une maintenance. Elle sera de nouveau disponible dans quelques instants ; cette page se recharge seule.', 'refresh' => 30]) ?>

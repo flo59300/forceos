@@ -1,0 +1,34 @@
+#!/bin/sh
+# =====================================================================
+# ForceOS : services du système
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -e
+
+# --- Activés ---
+systemctl enable nftables.service
+systemctl enable mariadb.service
+systemctl enable ollama.service
+systemctl enable cups.service cups-browsed.service avahi-daemon.service
+# Antivirus à la demande (clic droit, ClamTk) : pas de démon résident, gourmand en mémoire
+systemctl enable clamav-freshclam.service
+systemctl enable unattended-upgrades.service apparmor.service
+# forceos-premier-demarrage est activé par l'installateur (preseed) :
+# en session « live », il n'y a pas de compte autorisé à préparer.
+
+# --- Désactivés : rien n'écoute sur le réseau sans raison ---
+# RustDesk ne démarre que pendant une assistance demandée par le militant
+systemctl disable rustdesk.service 2>/dev/null || true
+systemctl mask ssh.service 2>/dev/null || true
+systemctl disable bluetooth.service 2>/dev/null || true
+
+# --- Compte du moteur d'IA ---
+if ! getent passwd ollama >/dev/null; then
+  useradd --system --home-dir /var/lib/ollama --shell /usr/sbin/nologin --user-group ollama
+fi
+chown -R ollama:ollama /var/lib/ollama
+chmod 0750 /var/lib/ollama
+
+# --- MariaDB : la base de démonstration et l'accès anonyme n'existent pas
+# sous Debian ; les droits des fichiers de configuration sont resserrés.
+chmod 0644 /etc/mysql/mariadb.conf.d/99-forceos.cnf

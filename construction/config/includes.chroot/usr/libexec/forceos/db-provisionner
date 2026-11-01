@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : base de données de FO Gestion pour le compte autorisé
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Le militant se connecte à MariaDB par son compte Linux (unix_socket) :
+# aucun mot de passe de base de données n'existe, donc aucun à voler.
+# Les tables sont créées par FO Gestion à son premier lancement.
+# Peut être relancé sans risque (aucune donnée n'est effacée).
+# =====================================================================
+set -euo pipefail
+FICHIER=/etc/forceos/utilisateur-autorise
+UTIL=$(tr -d '[:space:]' < "$FICHIER")
+[[ $UTIL =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || { echo "Nom de compte invalide dans $FICHIER" >&2; exit 1; }
+getent passwd "$UTIL" >/dev/null || { echo "Le compte $UTIL n'existe pas." >&2; exit 1; }
+[[ $(stat -c '%u %a' "$FICHIER") == "0 644" ]] || { chown root:root "$FICHIER"; chmod 0644 "$FICHIER"; }
+
+for _ in $(seq 60); do mariadb -e 'SELECT 1' >/dev/null 2>&1 && break; sleep 1; done
+mariadb <<SQL
+CREATE DATABASE IF NOT EXISTS forceos_gestion CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS '$UTIL'@'localhost' IDENTIFIED VIA unix_socket;
+GRANT ALL PRIVILEGES ON forceos_gestion.* TO '$UTIL'@'localhost';
+FLUSH PRIVILEGES;
+SQL
+echo "Base forceos_gestion prête pour le compte $UTIL."

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : enregistrement des consignes de l'assistant IA
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Appelé par FO Gestion via pkexec (mot de passe administrateur).
+# Le JSON est lu sur l'entrée standard, contrôlé ici même (on ne se fie
+# pas au contrôle fait par l'application), puis remplace le fichier de
+# façon atomique ; la version précédente est gardée.
+# =====================================================================
+set -euo pipefail
+umask 022
+CIBLE=/etc/forceos/ia/prompts.json
+TMP=$(mktemp /etc/forceos/ia/.prompts.XXXXXX)
+trap 'rm -f "$TMP"' EXIT
+head -c 262145 > "$TMP"
+(( $(stat -c %s "$TMP") <= 262144 )) || { echo "Consignes trop volumineuses." >&2; exit 2; }
+
+python3 -I - "$TMP" <<'PY'
+import json, re, sys
+try:
+    c = json.load(open(sys.argv[1], encoding='utf-8'))
+except Exception:
+    sys.exit("Le contenu n'est pas un JSON valide.")
+def chaine(v, m): return isinstance(v, str) and v.strip() and len(v) <= m
+def temp(t): return isinstance(t, (int, float)) and not isinstance(t, bool) and 0 <= t <= 1.5
+e = []
+if not isinstance(c, dict): sys.exit("Le contenu n'est pas un objet JSON.")
+if c.get('version') != 1: e.append('Version de format inconnue.')
+m = c.get('modele')
+if not chaine(m, 100) or not re.fullmatch(r'[a-z0-9][a-z0-9._-]*(:[a-z0-9._-]+)?', m): e.append('Nom de modèle invalide.')
+if not chaine(c.get('systeme'), 20000): e.append('Consigne générale invalide.')
+if 'bibliotheque_consigne' in c and not chaine(c['bibliotheque_consigne'], 5000): e.append('Consigne des documents invalide.')
+p = c.get('parametres') or {}
+if not isinstance(p, dict): e.append('Paramètres invalides.')
+else:
+    n = p.get('num_ctx')
+    if n is not None and not (isinstance(n, int) and not isinstance(n, bool) and 2048 <= n <= 32768): e.append('num_ctx invalide.')
+    if 'temperature' in p and not temp(p['temperature']): e.append('Température invalide.')
+a = c.get('actions')
+if not isinstance(a, dict): e.append('Actions absentes.')
+else:
+    for k in ('question', 'accord', 'tract', 'prudhommes', 'audio', 'extraction'):
+        x = a.get(k)
+        if not isinstance(x, dict): e.append(f'Action {k} manquante.'); continue
+        if not chaine(x.get('libelle'), 80) or not chaine(x.get('consigne'), 20000): e.append(f'Action {k} invalide.')
+        if 'temperature' in x and not temp(x['temperature']): e.append(f'Température de {k} invalide.')
+if e: sys.exit(' '.join(e))
+PY
+
+chmod 0644 "$TMP"
+[[ -f $CIBLE ]] && cp -p "$CIBLE" "$CIBLE.precedent"
+mv -f "$TMP" "$CIBLE"
+trap - EXIT
+logger -t forceos-ia "Consignes de l'assistant modifiées par l'administrateur (compte ${PKEXEC_UID:-?})"

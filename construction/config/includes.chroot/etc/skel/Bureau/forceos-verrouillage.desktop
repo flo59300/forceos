@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Verrouillage rapide
+Comment=Verrouiller le poste
+Exec=forceos-urgence
+Icon=system-lock-screen
+Terminal=false
+StartupNotify=true

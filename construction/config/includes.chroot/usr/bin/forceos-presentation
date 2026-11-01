@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# =====================================================================
+# forceos-presentation : mode Présentation / projection
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Activation : écran dupliqué sur le projecteur (ou projecteur seul), à la
+# résolution choisie ; mise en veille et verrouillage suspendus ;
+# notifications coupées (Signal, FO Gestion, messagerie) pour qu'aucune
+# donnée syndicale n'apparaisse à l'écran devant la direction.
+# Second clic : tout est rétabli à l'identique.
+# =====================================================================
+set -uo pipefail
+TITRE="Mode présentation"
+ETAT=${XDG_RUNTIME_DIR:-/tmp}/forceos-presentation.etat
+q() { xfconf-query -c "$1" -p "$2" 2>/dev/null; }
+s() { xfconf-query -c "$1" -p "$2" -n -t "$3" -s "$4" 2>/dev/null; }
+
+# ---------------------------------------------------------------------
+# Désactivation : retour à l'état mémorisé
+# ---------------------------------------------------------------------
+if [[ -f $ETAT ]]; then
+  # shellcheck source=/dev/null
+  source "$ETAT"
+  s xfce4-notifyd /do-not-disturb bool "${ancien_dnd:-false}"
+  s xfce4-screensaver /saver/enabled bool "${ancien_veille:-true}"
+  s xfce4-screensaver /lock/enabled bool "${ancien_verrou:-true}"
+  s xfce4-power-manager /xfce4-power-manager/presentation-mode bool false
+  xset s on +dpms 2>/dev/null
+  [[ -n ${externe:-} ]] && xrandr --output "$externe" --off 2>/dev/null
+  [[ -n ${interne:-} ]] && xrandr --output "$interne" --auto --primary 2>/dev/null
+  rm -f "$ETAT"
+  zenity --notification --text="Mode présentation désactivé : notifications et verrouillage rétablis." 2>/dev/null &
+  exit 0
+fi
+
+# ---------------------------------------------------------------------
+# Activation
+# ---------------------------------------------------------------------
+mapfile -t connectes < <(xrandr --query | awk '/ connected/ {print $1}')
+interne=$(printf '%s\n' "${connectes[@]}" | grep -m1 -E '^(eDP|LVDS|DSI)' || true)
+[[ -z $interne ]] && interne=${connectes[0]:-}
+externe=$(printf '%s\n' "${connectes[@]}" | grep -vx -- "$interne" | head -1 || true)
+
+if [[ -z $externe ]]; then
+  zenity --question --title="$TITRE" --width=420 \
+    --text="Aucun projecteur ni second écran n'est détecté.\n\nActiver quand même le mode présentation (notifications coupées, sans mise en veille) ?" 2>/dev/null || exit 0
+  mode=aucun
+else
+  # Résolutions communes à l'écran du poste et au projecteur, la plus grande d'abord
+  res_int=$(xrandr --query | awk -v o="$interne" '$1==o{f=1;next} /^[^ ]/{f=0} f && $1 ~ /^[0-9]+x[0-9]+$/ {print $1}')
+  res_ext=$(xrandr --query | awk -v o="$externe" '$1==o{f=1;next} /^[^ ]/{f=0} f && $1 ~ /^[0-9]+x[0-9]+$/ {print $1}')
+  communes=$(comm -12 <(sort -u <<<"$res_int") <(sort -u <<<"$res_ext") | sort -t x -k1,1nr -k2,2nr)
+  choix=$(zenity --list --title="$TITRE" --width=460 --height=380 \
+    --text="Projecteur détecté : $externe\nChoisissez l'affichage :" --column="Affichage" \
+    "Dupliquer l'écran (recommandé)" "Projecteur seul" "Étendre le bureau sur le projecteur" 2>/dev/null) || exit 0
+  case $choix in
+    Dupliquer*)
+      liste=$(printf '%s\n' $communes)
+      [[ -z $liste ]] && liste=$(printf '%s\n' "1920x1080" "1280x720" "1024x768")
+      res=$(zenity --list --title="$TITRE" --width=360 --height=380 --text="Résolution du projecteur :" \
+        --column="Résolution" $liste 2>/dev/null) || exit 0
+      xrandr --output "$interne" --mode "$res" --primary --output "$externe" --mode "$res" --same-as "$interne" 2>/dev/null \
+        || xrandr --output "$externe" --auto --same-as "$interne"
+      mode=duplique ;;
+    Projecteur*)
+      xrandr --output "$externe" --auto --primary --output "$interne" --off; mode=projecteur ;;
+    *)
+      xrandr --output "$externe" --auto --right-of "$interne"; mode=etendu ;;
+  esac
+fi
+
+# Mémorisation de l'état actuel pour le rétablir ensuite
+{
+  printf 'ancien_dnd=%q\n' "$(q xfce4-notifyd /do-not-disturb || echo false)"
+  printf 'ancien_veille=%q\n' "$(q xfce4-screensaver /saver/enabled || echo true)"
+  printf 'ancien_verrou=%q\n' "$(q xfce4-screensaver /lock/enabled || echo true)"
+  printf 'interne=%q\nexterne=%q\nmode=%q\n' "$interne" "${externe:-}" "$mode"
+} > "$ETAT"
+chmod 0600 "$ETAT"
+
+# Notifications coupées, veille et verrouillage suspendus
+s xfce4-notifyd /do-not-disturb bool true
+s xfce4-screensaver /saver/enabled bool false
+s xfce4-screensaver /lock/enabled bool false
+s xfce4-power-manager /xfce4-power-manager/presentation-mode bool true
+xset s off -dpms 2>/dev/null
+
+zenity --info --title="$TITRE" --width=440 \
+  --text="Mode présentation activé.\n\n• Notifications coupées (Signal, FO Gestion, messagerie)\n• Pas de mise en veille ni de verrouillage automatique\n\nPensez à fermer les documents confidentiels avant de projeter.\nRecliquez sur « Mode présentation » pour revenir à la normale." 2>/dev/null &

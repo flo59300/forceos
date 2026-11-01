@@ -1,0 +1,14 @@
+#!/bin/sh
+# =====================================================================
+# ForceOS : contrôle des composants d'IA locale copiés par construire.sh
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -e
+test -x /usr/bin/ollama                              || { echo "Ollama absent" >&2; exit 1; }
+test -x /usr/lib/forceos/whisper/whisper-cli         || { echo "whisper-cli absent" >&2; exit 1; }
+test -s /usr/share/forceos/whisper/ggml-small.bin    || { echo "modèle whisper absent" >&2; exit 1; }
+test -d /var/lib/ollama/models/manifests             || { echo "modèle d'IA absent" >&2; exit 1; }
+# whisper-cli doit fonctionner sans bibliothèque extérieure
+/usr/lib/forceos/whisper/whisper-cli --help >/dev/null 2>&1 || { echo "whisper-cli inutilisable" >&2; exit 1; }
+chmod 0755 /usr/lib/forceos/whisper/whisper-cli
+chmod 0644 /usr/share/forceos/whisper/ggml-small.bin

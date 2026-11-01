@@ -1,0 +1,35 @@
+// =====================================================================
+// ForceOS : règles polkit
+// Conçu et développé par Florian Bigotte pour Force Ouvrière
+// =====================================================================
+
+// L'administrateur du poste est root (mot de passe gardé par Florian) :
+// le militant n'est pas dans le groupe sudo et ne peut pas s'autoriser
+// lui-même une action d'administration.
+polkit.addAdminRule(function (action, subject) {
+    return ["unix-user:0"];
+});
+
+// Le militant ne peut ni installer ni supprimer de logiciels, ni modifier
+// les comptes, ni changer l'heure ou les réglages de démarrage.
+polkit.addRule(function (action, subject) {
+    if (subject.user === "root") {
+        return polkit.Result.NOT_HANDLED;
+    }
+    var interdits = [
+        "org.freedesktop.packagekit.",
+        "org.freedesktop.accounts.",
+        "org.freedesktop.timedate1.",
+        "org.freedesktop.locale1.",
+        "org.freedesktop.hostname1.",
+        "org.freedesktop.udisks2.encrypted-unlock-system",
+        "org.freedesktop.udisks2.modify-device-system",
+        "org.freedesktop.udisks2.filesystem-mount-system"
+    ];
+    for (var i = 0; i < interdits.length; i++) {
+        if (action.id.indexOf(interdits[i]) === 0) {
+            return polkit.Result.AUTH_ADMIN;
+        }
+    }
+    return polkit.Result.NOT_HANDLED;
+});

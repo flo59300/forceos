@@ -1,0 +1,12 @@
+# ForceOS : effacement des traces à l'ouverture et à la fermeture de session (Florian Bigotte)
+[Unit]
+Description=Effacement des traces de la session ForceOS
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/forceos/nettoyage-session
+ExecStop=/usr/libexec/forceos/nettoyage-session
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Assistant syndical FO</title>
+  <link rel="stylesheet" href="/modules/forceos/forceos.css">
+  <link rel="stylesheet" href="/modules/assistant/assistant.css">
+  <script src="/modules/assistant/assistant.js" defer></script>
+</head>
+<body>
+  <header class="fo-entete">
+    <img src="/modules/forceos/logo-fo.png" alt="Force Ouvrière">
+    <h1>Assistant syndical FO</h1>
+    <span id="etat-ia" class="fo-pastille">Vérification…</span>
+    <button id="btn-consignes" type="button" class="fo-bouton discret">Consignes</button>
+    <a href="/" class="fo-bouton discret">Retour à FO Gestion</a>
+  </header>
+
+  <main class="assistant">
+    <section id="accueil">
+      <div id="actions" class="actions"></div>
+      <div id="zone-audio" class="zone-audio" tabindex="0" role="button" aria-label="Déposer un enregistrement audio">
+        <strong>🎙️ Déposez ici un enregistrement audio</strong><br>
+        MP3, WAV, M4A, OGG ou FLAC : réunion, CSE, négociation, entretien.<br>
+        <small>Transcription et compte rendu entièrement réalisés sur ce poste. Vous pouvez saisir une consigne particulière avant de déposer le fichier.</small>
+        <input id="choix-audio" type="file" accept=".mp3,.wav,.m4a,.ogg,.opus,.flac,.aac,.webm" hidden>
+      </div>
+      <div class="biblio">
+        <span id="etat-biblio">Documents de l'IA : vérification…</span>
+        <button type="button" class="fo-lien" id="btn-biblio-dossier">📄 Ouvrir le dossier Documents_IA</button>
+        <button id="btn-biblio-indexer" type="button" class="fo-lien">Mettre à jour</button>
+      </div>
+    </section>
+
+    <section id="conversation" class="conversation" aria-live="polite"></section>
+
+    <form id="saisie" class="saisie">
+      <span id="mode" class="mode"></span>
+      <textarea id="texte" rows="4" aria-label="Votre message"></textarea>
+      <div class="options">
+        <label class="case"><input id="avec-biblio" type="checkbox"> Consulter les documents de l'IA</label>
+        <button id="btn-document" type="button" class="fo-bouton discret">📄 Joindre un document</button>
+        <input id="choix-document" type="file" accept=".pdf,.docx,.odt,.txt,.md,.epub" hidden>
+      </div>
+      <div class="commandes">
+        <button id="btn-nouveau" type="button" class="fo-bouton discret">Nouvelle conversation</button>
+        <button id="btn-stop" type="button" class="fo-bouton rouge" hidden>Arrêter</button>
+        <button id="btn-envoyer" type="submit" class="fo-bouton">Envoyer (Ctrl+Entrée)</button>
+      </div>
+    </form>
+  </main>
+
+  <footer class="fo-pied">
+    Assistant ForceOS fonctionnant entièrement hors ligne : aucune donnée ne quitte ce poste.
+    Conçu et développé par Florian Bigotte pour Force Ouvrière.
+  </footer>
+
+  <dialog id="dlg-consignes">
+    <header>Consignes de l'assistant IA</header>
+    <div class="contenu">
+      <p>Ces consignes guident l'IA en arrière-plan. Leur modification exige le mot de passe administrateur du poste.</p>
+      <div id="form-consignes" style="display:grid;gap:12px"></div>
+      <p id="erreur-consignes" class="message-erreur"></p>
+    </div>
+    <footer>
+      <button id="btn-fermer-consignes" type="button" class="fo-bouton discret">Fermer</button>
+      <button id="btn-enregistrer-consignes" type="button" class="fo-bouton">Enregistrer</button>
+    </footer>
+  </dialog>
+</body>
+</html>

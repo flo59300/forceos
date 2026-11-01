@@ -1,0 +1,7 @@
+# ForceOS : les réglages par défaut du bureau (dossier /etc/xdg/forceos) passent
+# avant ceux des paquets Debian, sans modifier les fichiers des paquets.
+# Conçu par Florian Bigotte. Fichier lu par Xsession au démarrage de la session.
+case ":${XDG_CONFIG_DIRS:-/etc/xdg}:" in
+  *:/etc/xdg/forceos:*) ;;
+  *) XDG_CONFIG_DIRS="/etc/xdg/forceos:${XDG_CONFIG_DIRS:-/etc/xdg}"; export XDG_CONFIG_DIRS ;;
+esac

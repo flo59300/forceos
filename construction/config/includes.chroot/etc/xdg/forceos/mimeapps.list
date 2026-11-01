@@ -1,0 +1,10 @@
+# ForceOS : applications par défaut (Florian Bigotte)
+[Default Applications]
+application/epub+zip=com.github.johnfactotum.Foliate.desktop
+application/pdf=org.gnome.Evince.desktop
+x-scheme-handler/http=librewolf.desktop
+x-scheme-handler/https=librewolf.desktop
+text/html=librewolf.desktop
+application/vnd.oasis.opendocument.text=libreoffice-writer.desktop
+application/vnd.oasis.opendocument.spreadsheet=libreoffice-calc.desktop
+application/vnd.scribus=scribus.desktop

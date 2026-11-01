@@ -1,0 +1,2 @@
+// ForceOS : les politiques du navigateur sont réappliquées après chaque mise à jour
+DPkg::Post-Invoke { "if [ -x /usr/libexec/forceos/librewolf-politiques ]; then /usr/libexec/forceos/librewolf-politiques || true; fi"; };

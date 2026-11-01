@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Mode présentation
+Comment=Projeter sans notifications ni mise en veille
+Exec=forceos-presentation
+Icon=video-display
+Terminal=false
+StartupNotify=true

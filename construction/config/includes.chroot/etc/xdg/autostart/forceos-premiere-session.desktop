@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Préparation du bureau ForceOS
+Exec=/usr/libexec/forceos/premiere-session
+OnlyShowIn=XFCE;
+NoDisplay=true
+X-XFCE-Autostart-Override=true

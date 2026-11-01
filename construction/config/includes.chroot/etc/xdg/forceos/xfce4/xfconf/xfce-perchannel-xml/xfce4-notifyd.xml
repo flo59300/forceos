@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ForceOS : notifications discrètes, sans contenu sur l'écran verrouillé (Florian Bigotte) -->
+<channel name="xfce4-notifyd" version="1.0">
+  <property name="theme" type="string" value="Greybird"/>
+  <property name="notify-location" type="uint" value="2"/>
+  <property name="do-not-disturb" type="bool" value="false"/>
+  <property name="notification-log" type="bool" value="false"/>
+</channel>

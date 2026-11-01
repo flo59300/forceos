@@ -1,0 +1,13 @@
+# ForceOS : résolveur DNS filtrant remis en place à chaque démarrage (Florian Bigotte)
+[Unit]
+Description=Résolveur DNS filtrant ForceOS
+DefaultDependencies=no
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/install -m 0644 -o root -g root /etc/forceos/resolv.conf /etc/resolv.conf
+
+[Install]
+WantedBy=sysinit.target

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Documents de l'IA
+Comment=Documents consultés par l'assistant de FO Gestion
+Exec=forceos-dossier documents-ia
+Icon=folder-documents
+Terminal=false
+StartupNotify=true

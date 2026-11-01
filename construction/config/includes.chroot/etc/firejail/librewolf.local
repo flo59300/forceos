@@ -1,0 +1,8 @@
+# ForceOS : le navigateur, isolé par Firejail, ne voit ni le coffre-fort,
+# ni les données de FO Gestion, ni les documents de l'IA (Florian Bigotte)
+blacklist ${HOME}/Coffre-FO
+blacklist /run/forceos
+blacklist /var/lib/forceos
+blacklist ${HOME}/.config/ForceOS
+blacklist ${DOCUMENTS}/Documents_IA
+blacklist ${DOCUMENTS}/Bibliothèque_Syndicale

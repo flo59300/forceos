@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self'; font-src 'self'">
+<title>Bienvenue dans FO Gestion</title>
+<style>
+  /* ForceOS : première configuration de FO Gestion. Conçu par Florian Bigotte pour Force Ouvrière. */
+  :root { --bleu: #002B7F; --bleu-fonce: #001d57; --rouge: #E2001A; --fond: #F3F5FA; --texte: #1b2333; --gris: #5d6779; --bord: #d3d9e6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: Carlito, Calibri, "Liberation Sans", sans-serif; background: var(--fond); color: var(--texte); font-size: 15px; display: flex; flex-direction: column; }
+  header { background: #fff; border-bottom: 4px solid var(--rouge); padding: 18px 32px; display: flex; align-items: center; gap: 18px; }
+  header img { width: 64px; height: 64px; }
+  header h1 { margin: 0; color: var(--bleu); font-size: 24px; }
+  header p { margin: 2px 0 0; color: var(--gris); }
+  main { flex: 1; overflow: auto; padding: 18px 32px 22px; }
+  form { max-width: 720px; margin: 0 auto; display: grid; gap: 14px; }
+  fieldset { border: 1px solid var(--bord); border-radius: 10px; background: #fff; padding: 10px 18px 16px; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  legend { color: var(--bleu); font-weight: 700; font-size: 16px; padding: 0 6px; }
+  .large { grid-column: 1 / -1; }
+  label { display: block; font-weight: 700; color: var(--bleu); font-size: 14px; }
+  label small { font-weight: 400; color: var(--gris); }
+  input { display: block; margin-top: 5px; font: inherit; font-weight: 400; padding: 9px 11px; border: 1px solid var(--bord); border-radius: 7px; background: #fff; color: var(--texte); width: 100%; }
+  input:focus { outline: 2px solid var(--bleu); outline-offset: 0; border-color: transparent; }
+  input[aria-invalid="true"] { border-color: var(--rouge); }
+  .force { height: 6px; border-radius: 3px; background: var(--bord); overflow: hidden; }
+  .force div { height: 100%; width: 0; background: var(--rouge); transition: width .2s, background .2s; }
+  .aide { font-size: 13px; color: var(--gris); margin: 0; }
+  .alerte { background: #fff1f2; border: 1px solid var(--rouge); color: #8c0011; border-radius: 8px; padding: 10px 14px; margin: 0; }
+  .alerte[hidden] { display: none; }
+  .actions { display: flex; justify-content: flex-end; }
+  button { font: inherit; font-weight: 700; background: var(--bleu); color: #fff; border: 0; border-radius: 8px; padding: 11px 22px; cursor: pointer; }
+  button:hover { background: var(--bleu-fonce); }
+  button:disabled { opacity: .6; cursor: default; }
+  footer { text-align: center; color: var(--gris); font-size: 12px; padding: 10px; border-top: 1px solid var(--bord); background: #fff; }
+</style>
+<script src="configuration.js" defer></script>
+</head>
+<body>
+  <header>
+    <img src="logo-fo.png" alt="Force Ouvrière">
+    <div>
+      <h1>Bienvenue dans FO Gestion</h1>
+      <p>Première configuration de ce poste ForceOS. Ces informations ne quittent jamais l'ordinateur.</p>
+    </div>
+  </header>
+  <main>
+    <form id="formulaire" novalidate>
+      <p class="alerte" id="erreur" role="alert" hidden></p>
+
+      <fieldset>
+        <legend>Votre section syndicale</legend>
+        <label class="large">Nom de la section
+          <input name="section" required minlength="2" maxlength="255" placeholder="FO Stellantis Valenciennes" autocomplete="organization">
+        </label>
+        <label>Tarif du timbre (€)
+          <input name="tarif_timbre" inputmode="decimal" value="5,00" required>
+        </label>
+        <label>Tarif de la carte (€)
+          <input name="tarif_carte" inputmode="decimal" value="2,00" required>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Compte du secrétaire</legend>
+        <label>Prénom <input name="prenom" required maxlength="100" autocomplete="given-name"></label>
+        <label>Nom <input name="nom" required maxlength="100" autocomplete="family-name"></label>
+        <label class="large">Adresse e-mail <small>(identifiant de connexion)</small>
+          <input name="email" type="email" required maxlength="191" autocomplete="email">
+        </label>
+        <label>Mot de passe <small>(12 caractères au minimum)</small>
+          <input name="mot_de_passe" type="password" required minlength="12" autocomplete="new-password">
+        </label>
+        <label>Confirmation <small>(même mot de passe)</small>
+          <input name="confirmation" type="password" required minlength="12" autocomplete="new-password">
+        </label>
+        <div class="large">
+          <div class="force" aria-hidden="true"><div id="force"></div></div>
+          <p class="aide" id="force-texte">Une courte phrase est plus sûre et plus facile à retenir qu'un mot compliqué.</p>
+        </div>
+      </fieldset>
+
+      <div class="actions"><button type="submit" id="valider">Créer la section et le compte</button></div>
+    </form>
+  </main>
+  <footer>FO Gestion sur ForceOS · Conçu et développé par Florian Bigotte pour Force Ouvrière</footer>
+</body>
+</html>

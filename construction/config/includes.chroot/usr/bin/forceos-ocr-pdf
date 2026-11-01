@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# =====================================================================
+# forceos-ocr-pdf : rend un PDF scanné consultable (texte reconnu en français)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Le document d'origine n'est jamais modifié : le résultat est enregistré à
+# côté, sous le nom « <document> (OCR).pdf ». Le traitement se fait sur le
+# poste, dans un bac à sable sans réseau.
+# =====================================================================
+set -uo pipefail
+TITRE="Reconnaissance de texte (OCR)"
+(( $# )) || { zenity --error --title="$TITRE" --text="Aucun fichier sélectionné." 2>/dev/null; exit 1; }
+
+ok=0; erreurs=""
+for f in "$@"; do
+  [[ -f $f ]] || continue
+  sortie="${f%.*} (OCR).pdf"
+  if [[ -e $sortie ]]; then erreurs+="\n• $(basename "$f") : « $(basename "$sortie") » existe déjà"; continue; fi
+  if firejail --quiet --noprofile --net=none --caps.drop=all --nonewprivs --seccomp -- \
+       ocrmypdf --language fra --skip-text --rotate-pages --deskew --output-type pdf \
+       --jobs "$(nproc)" "$f" "$sortie" 2>/dev/null \
+       | zenity --progress --pulsate --auto-close --no-cancel --title="$TITRE" \
+           --text="Analyse de « $(basename "$f") »…\nComptez quelques secondes par page." 2>/dev/null
+     [[ -s $sortie ]]; then
+    ok=$((ok + 1))
+  else
+    rm -f "$sortie"; erreurs+="\n• $(basename "$f") : document illisible ou protégé"
+  fi
+done
+msg="$ok document(s) rendu(s) consultable(s)."
+[[ -n $erreurs ]] && msg+="\n\nNon traités :$erreurs"
+zenity --info --title="$TITRE" --width=420 --text="$msg" 2>/dev/null

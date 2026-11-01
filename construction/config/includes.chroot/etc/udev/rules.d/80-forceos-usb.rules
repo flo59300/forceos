@@ -1,0 +1,7 @@
+# =====================================================================
+# ForceOS : seules les clés et disques USB autorisés par l'administrateur
+# sont utilisables (fuite de fichiers, clé piégée). Claviers, souris,
+# imprimantes et téléphones en charge ne sont pas concernés.
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_interface", ATTR{bInterfaceClass}=="08", RUN+="/usr/libexec/forceos/usb-autorisee %p"

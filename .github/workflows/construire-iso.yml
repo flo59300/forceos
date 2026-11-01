@@ -1,0 +1,79 @@
+# =====================================================================
+# ForceOS : fabrication automatique du paquet FO Gestion et de l'image ISO
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Lancement : onglet « Actions », « Construire ForceOS », « Run workflow ».
+# Résultat : l'image forceos-<version>-amd64.iso à télécharger en bas de
+# la page de l'exécution, rubrique « Artifacts » (gardée 30 jours).
+# =====================================================================
+name: Construire ForceOS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  paquet:
+    name: Paquet FO Gestion
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: application/package-lock.json
+      - name: Construire le paquet .deb
+        working-directory: application
+        run: |
+          npm ci
+          npx electron-builder --linux deb --x64 --publish never
+          ls -lh dist/*.deb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paquet-fo-gestion
+          path: application/dist/*.deb
+          retention-days: 7
+          compression-level: 0
+
+  iso:
+    name: Image ISO
+    needs: paquet
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - name: Libérer de la place sur la machine de construction
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost /usr/share/swift
+          sudo docker image prune --all --force >/dev/null
+          df -h /
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: paquet-fo-gestion
+          path: paquet
+      - name: Construire l'image dans Debian 13
+        run: |
+          DEB=$(ls paquet/*.deb)
+          sudo docker run --rm --privileged \
+            -v "$PWD:/w" -w /w/construction \
+            debian:trixie \
+            bash -c "apt-get update -qq && apt-get install -y -qq ca-certificates curl >/dev/null && ./construire.sh /w/$DEB"
+          ls -lh construction/*.iso
+      - uses: actions/upload-artifact@v4
+        with:
+          name: forceos-iso
+          path: |
+            construction/*.iso
+            construction/*.iso.sha256
+          retention-days: 30
+          compression-level: 0
+      - name: Journal en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: journal-construction
+          path: construction/construction.log
+          if-no-files-found: ignore

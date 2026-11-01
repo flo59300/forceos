@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : effacement des traces de la session du militant
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Lancé à l'ouverture ET à la fermeture de session (systemd utilisateur) :
+# si le poste a été coupé brutalement, le nettoyage se fait au démarrage
+# suivant. Ne touche jamais aux documents ni à la base de FO Gestion.
+# =====================================================================
+set -u
+D=$HOME/.config/ForceOS
+
+# Caches du navigateur, vignettes d'images, caches divers
+find "$HOME/.cache" -mindepth 1 -maxdepth 1 ! -name fontconfig -exec rm -rf {} + 2>/dev/null
+
+# FO Gestion (Electron) : caches du moteur de rendu, fichiers temporaires,
+# sessions PHP (une reconnexion est demandée à chaque ouverture)
+for c in Cache "Code Cache" GPUCache DawnGraphiteCache DawnWebGPUCache "Shared Dictionary" blob_storage "Service Worker/CacheStorage"; do
+  rm -rf "${D:?}/${c:?}" 2>/dev/null
+done
+rm -rf "$D/tmp/"* "$D/writable/session/"* "$D/writable/debugbar/"* 2>/dev/null
+# Cache de FO Gestion : seuls les derniers cours et articles connus sont gardés
+find "$D/writable/cache" -type f ! -name 'stocks_dernier_*' ! -name 'rss_dernier_*' ! -name index.html -delete 2>/dev/null
+
+# Documents récents, historiques
+rm -f "$HOME/.local/share/recently-used.xbel" "$HOME/.bash_history" "$HOME/.python_history" \
+      "$HOME/.lesshst" "$HOME/.viminfo" "$HOME/.wget-hsts" 2>/dev/null
+rm -rf "$HOME/.local/share/Trash/"* 2>/dev/null
+exit 0

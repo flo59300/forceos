@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Coffre-fort FO
+Comment=Ouvrir ou fermer l'espace chiffré des documents sensibles
+Exec=forceos-coffre
+Icon=security-high
+Terminal=false
+StartupNotify=true

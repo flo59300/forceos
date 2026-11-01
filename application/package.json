@@ -1,0 +1,108 @@
+{
+  "name": "forceos-fo-gestion",
+  "productName": "FO Gestion",
+  "version": "1.0.0",
+  "description": "Application syndicale Force Ouvrière intégrée à ForceOS : adhérents, trésorerie, mandats, assistant IA local.",
+  "homepage": "https://www.force-ouvriere.fr",
+  "author": {
+    "name": "Florian Bigotte",
+    "email": "contact@a-completer.fr"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "integrer": "python3 -I outils/integrer-fo-gestion.py ../fo-gestion-3 www",
+    "start": "electron .",
+    "build:deb": "npm run integrer && electron-builder --linux deb --x64"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.11.2",
+    "yauzl": "^3.4.0"
+  },
+  "devDependencies": {
+    "electron": "^45.1.0",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "fr.force-ouvriere.forceos.gestion",
+    "productName": "FO Gestion",
+    "copyright": "Conçu et développé par Florian Bigotte pour Force Ouvrière",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "lib/**/*",
+      "premiere-configuration/**/*",
+      "!**/*.map"
+    ],
+    "extraResources": [
+      {
+        "from": "php",
+        "to": "php"
+      },
+      {
+        "from": "www",
+        "to": "www"
+      },
+      {
+        "from": "assets",
+        "to": "assets"
+      }
+    ],
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "executableName": "forceos-fo-gestion",
+      "category": "Office",
+      "icon": "assets/icones",
+      "maintainer": "Florian Bigotte <contact@a-completer.fr>",
+      "vendor": "Force Ouvrière",
+      "synopsis": "Gestion syndicale FO hors ligne et sécurisée",
+      "desktop": {
+        "entry": {
+          "Name": "FO Gestion",
+          "Comment": "Application syndicale Force Ouvrière (développée par Florian Bigotte)",
+          "Icon": "forceos",
+          "Categories": "Office;"
+        }
+      }
+    },
+    "deb": {
+      "priority": "optional",
+      "depends": [
+        "php-cli",
+        "php-cgi",
+        "php8.4-cli (>= 8.4.27-1~deb13u1)",
+        "php8.4-cgi (>= 8.4.27-1~deb13u1)",
+        "php-mysql",
+        "php-curl",
+        "php-gd",
+        "php-imagick",
+        "php-intl",
+        "php-mbstring",
+        "php-xml",
+        "php-zip",
+        "mariadb-server",
+        "gnome-keyring",
+        "libsecret-1-0",
+        "ffmpeg",
+        "poppler-utils",
+        "tesseract-ocr",
+        "tesseract-ocr-fra",
+        "firejail",
+        "pkexec",
+        "libgtk-3-0t64 | libgtk-3-0",
+        "libatspi2.0-0t64 | libatspi2.0-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "libuuid1",
+        "xdg-utils"
+      ]
+    },
+    "publish": []
+  }
+}

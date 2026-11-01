@@ -1,0 +1,18 @@
+#!/bin/sh
+# =====================================================================
+# ForceOS : navigateur LibreWolf depuis son dépôt officiel
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# extrepo (paquet Debian) fournit la définition du dépôt et sa clé de
+# signature vérifiée par Debian : aucune clé n'est téléchargée à la main.
+# =====================================================================
+set -e
+if ! extrepo enable librewolf; then
+  # Le dépôt LibreWolf peut être classé hors « main » par extrepo : on l'autorise
+  sed -i 's/^- main$/- main\n- contrib\n- non-free/' /etc/extrepo/config.yaml
+  extrepo enable librewolf
+fi
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y librewolf
+# Firefox ESR n'est pas installé : un seul navigateur, verrouillé
+apt-get purge -y firefox-esr 2>/dev/null || true

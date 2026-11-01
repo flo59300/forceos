@@ -1,0 +1,18 @@
+#!/bin/sh
+# =====================================================================
+# ForceOS : finalisation de l'image
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -e
+# Base antivirale à jour dans l'image (elle sera rafraîchie ensuite par freshclam)
+freshclam --quiet || echo "freshclam : base antivirale non mise à jour, elle le sera au premier démarrage" >&2
+
+# Paquets inutiles et caches
+apt-get autoremove --purge -y
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache
+rm -f /var/log/*.log /var/log/apt/* 2>/dev/null || true
+
+# Identifiant de machine régénéré à chaque installation
+: > /etc/machine-id
+rm -f /var/lib/dbus/machine-id

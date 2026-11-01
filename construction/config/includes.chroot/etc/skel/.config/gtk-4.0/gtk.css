@@ -1,0 +1,5 @@
+/* ForceOS : couleurs Force Ouvrière dans les applications GTK 4 (Foliate…). Florian Bigotte. */
+@define-color accent_bg_color #002B7F;
+@define-color accent_fg_color #FFFFFF;
+@define-color accent_color #002B7F;
+@define-color destructive_bg_color #E2001A;

@@ -1,0 +1,4 @@
+# Dépôts (logos) : jamais de script exécuté ni servi depuis ce dossier
+<FilesMatch "\.(php|phtml|phar|html?|svg|js)$">
+    Require all denied
+</FilesMatch>

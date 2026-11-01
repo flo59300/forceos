@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=FO Gestion
+Comment=Adhérents, finances, assistant IA (Florian Bigotte)
+Exec="/opt/FO Gestion/forceos-fo-gestion" %U
+Icon=forceos
+Terminal=false
+StartupNotify=true

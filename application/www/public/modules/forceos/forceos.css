@@ -1,0 +1,33 @@
+/* ForceOS : charte graphique Force Ouvrière des modules ForceOS. Conçu et développé par Florian Bigotte. */
+:root {
+  --fo-bleu: #002B7F; --fo-bleu-fonce: #001d57; --fo-rouge: #E2001A;
+  --fo-fond: #f4f6fb; --fo-texte: #1b2333; --fo-gris: #5d6779; --fo-bord: #d9deea; --fo-rayon: 10px;
+  font-family: Carlito, Calibri, "Liberation Sans", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fo-fond); color: var(--fo-texte); font-size: 16px; }
+::selection { background: var(--fo-rouge); color: #fff; }
+.fo-entete { display: flex; align-items: center; gap: 14px; background: var(--fo-bleu); color: #fff; padding: 10px 20px; border-bottom: 4px solid var(--fo-rouge); }
+.fo-entete img { height: 40px; width: 40px; }
+.fo-entete h1 { font-size: 1.3rem; margin: 0; flex: 1; }
+.fo-entete a { color: #fff; }
+.fo-pastille { font-size: .85rem; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,.15); }
+.fo-pastille.ok::before { content: "● "; color: #4cd964; }
+.fo-pastille.ko::before { content: "● "; color: #ff6b7a; }
+.fo-bouton { background: var(--fo-bleu); color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; font: inherit; cursor: pointer; }
+.fo-bouton:hover { background: var(--fo-bleu-fonce); }
+.fo-bouton.rouge { background: var(--fo-rouge); }
+.fo-bouton.discret { background: transparent; color: var(--fo-bleu); border: 1px solid var(--fo-bord); }
+.fo-entete .fo-bouton.discret { color: #fff; border-color: rgba(255,255,255,.45); text-decoration: none; }
+.fo-bouton:disabled { opacity: .5; cursor: default; }
+.fo-lien { background: none; border: 0; color: var(--fo-bleu); text-decoration: underline; cursor: pointer; font: inherit; padding: 0; }
+.fo-pied { text-align: center; color: var(--fo-gris); font-size: .8rem; padding: 12px; }
+input, textarea, select { font: inherit; border: 1px solid var(--fo-bord); border-radius: 8px; padding: 8px 10px; width: 100%; }
+input:focus, textarea:focus { outline: 2px solid var(--fo-bleu); border-color: transparent; }
+dialog { border: 0; border-radius: var(--fo-rayon); padding: 0; width: min(760px, 94vw); box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+dialog::backdrop { background: rgba(0,27,87,.45); }
+dialog > header { background: var(--fo-bleu); color: #fff; padding: 12px 18px; font-weight: bold; border-bottom: 3px solid var(--fo-rouge); }
+dialog .contenu { padding: 18px; max-height: 65vh; overflow: auto; display: grid; gap: 12px; }
+dialog > footer { padding: 12px 18px; display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid var(--fo-bord); }
+dialog .message-erreur { color: var(--fo-rouge); }
+dialog label { font-weight: bold; color: var(--fo-bleu); display: grid; gap: 4px; }

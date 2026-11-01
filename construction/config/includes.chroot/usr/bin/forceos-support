@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : demander de l'aide à Florian (RustDesk)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# =====================================================================
+set -u
+TITRE="Assistance à distance"
+# shellcheck source=/dev/null
+. /etc/forceos/support.conf
+
+zenity --question --title="$TITRE" --width=480 --ok-label="Autoriser l'assistance" --cancel-label="Annuler" \
+  --text="Florian Bigotte va pouvoir voir votre écran et utiliser votre ordinateur pour vous aider.\n\nFermez d'abord les documents confidentiels qu'il n'a pas à voir. Vous pourrez arrêter l'assistance à tout moment, et elle s'arrêtera d'elle-même au bout de ${DUREE_MAX_MINUTES:-120} minutes." || exit 0
+
+if ! DUREE=$(pkexec /usr/libexec/forceos/support-ouvrir 2>"${XDG_RUNTIME_DIR:-/tmp}/support.err"); then
+  zenity --error --title="$TITRE" --text="L'assistance n'a pas pu démarrer.\n\n$(cat "${XDG_RUNTIME_DIR:-/tmp}/support.err" 2>/dev/null)"
+  exit 1
+fi
+
+# Configuration de RustDesk pour ce compte (même serveur que le service)
+mkdir -p "$HOME/.config/rustdesk"
+cat > "$HOME/.config/rustdesk/RustDesk2.toml" <<TOML
+rendezvous_server = '$SERVEUR:21116'
+
+[options]
+custom-rendezvous-server = '$SERVEUR'
+relay-server = '$SERVEUR'
+key = '$CLE'
+direct-server = 'N'
+TOML
+rustdesk >/dev/null 2>&1 &
+
+zenity --info --title="$TITRE" --width=420 --ok-label="Terminer l'assistance" \
+  --text="L'assistance est ouverte pour ${DUREE} minutes au plus.\n\nCommuniquez à Florian l'identifiant affiché par RustDesk.\n\nCliquez sur « Terminer l'assistance » dès que vous avez fini."
+pkexec /usr/libexec/forceos/support-fermer >/dev/null 2>&1
+notify-send -i security-high "$TITRE" "Assistance terminée. Plus personne ne peut accéder à ce poste."
