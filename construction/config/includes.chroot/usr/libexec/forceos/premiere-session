@@ -58,6 +58,13 @@ for p in $(xfconf-query -c xfce4-panel -l 2>/dev/null | grep -oE '^/panels/panel
     -t double -t double -t double -t double -s 0.0 -s 0.1686 -s 0.4980 -s 1.0
 done
 
+# --- Trousseau sécurisé : services GNOME lancés avec XFCE ----------------------
+# Sans eux, gnome-keyring ne démarre pas et FO Gestion ne peut pas protéger sa clé.
+xfconf-query -c xfce4-session -p /compat/LaunchGNOME -n -t bool -s true
+if ! busctl --user status org.freedesktop.secrets >/dev/null 2>&1; then
+  gnome-keyring-daemon --start --components=secrets >/dev/null 2>&1 || true
+fi
+
 # --- Raccourci discret du bouton d'urgence : Ctrl + Alt + Pause --------------
 xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Primary><Alt>Pause' -n -t string -s forceos-urgence
 # Verrouillage classique : Super + L

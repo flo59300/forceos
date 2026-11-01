@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ForceOS : services GNOME lancés avec la session XFCE (Florian Bigotte).
+     Indispensable au trousseau sécurisé (gnome-keyring), qui protège la clé
+     de chiffrement de FO Gestion. -->
+<channel name="xfce4-session" version="1.0">
+  <property name="compat" type="empty">
+    <property name="LaunchGNOME" type="bool" value="true"/>
+  </property>
+</channel>
