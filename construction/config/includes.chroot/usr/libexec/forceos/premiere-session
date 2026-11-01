@@ -17,6 +17,15 @@ mkdir -p "$DOCS/Bibliothèque_Syndicale" "$DOCS/Documents_IA"
 
 # --- Lanceurs du bureau approuvés (XFCE 4.18 et suivants) ----------------------
 BUREAU=$(xdg-user-dir DESKTOP)
+# Session autonome (clé USB) : icône d'installation sur le bureau. Absente une
+# fois le système installé, car le noyau n'est alors plus lancé avec boot=live.
+if grep -qw 'boot=live' /proc/cmdline; then
+  for lanceur in /usr/share/applications/debian-installer-launcher*.desktop; do
+    [[ -f $lanceur ]] || continue
+    sed -e 's/^Name=.*/Name=Installer ForceOS/' -e '/^Name\[/d' "$lanceur" > "$BUREAU/forceos-installer.desktop"
+    break
+  done
+fi
 for f in "$BUREAU"/forceos-*.desktop; do
   [[ -f $f ]] || continue
   chmod u+x "$f"

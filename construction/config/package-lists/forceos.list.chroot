@@ -23,6 +23,8 @@ console-setup
 keyboard-configuration
 tzdata
 sudo
+# Lanceur de l'installateur depuis la session autonome (icône « Installer ForceOS »)
+debian-installer-launcher
 
 # --- Bureau XFCE ---
 xorg

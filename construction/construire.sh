@@ -51,7 +51,7 @@ if ! grep -q '^SERVEUR=..' "$INC/etc/forceos/support.conf" 2>/dev/null; then
   sleep 5
 fi
 apt-get update >/dev/null
-apt-get install -y --no-install-recommends live-build curl zstd cmake build-essential git ca-certificates \
+apt-get install -y --no-install-recommends live-build file cpio curl zstd cmake build-essential git ca-certificates \
   nftables libxml2-utils gnupg >/dev/null
 
 # --- 1. Paquet FO Gestion -----------------------------------------------------------
