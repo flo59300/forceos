@@ -124,7 +124,28 @@ if command -v xmllint >/dev/null; then
   xmllint --noout "$INC"/usr/share/polkit-1/actions/*.policy || erreur "action polkit invalide."
 fi
 
-# --- 7. live-build ----------------------------------------------------------------------
+# --- 7. Paquets disponibles -------------------------------------------------------------
+# Un nom de paquet absent de Debian 13 ferait échouer toute la construction au bout
+# d'une heure : les listes sont vérifiées d'abord, les absents signalés et retirés.
+etape "Vérification des listes de paquets"
+VERIF=$(mktemp -d)
+mkdir -p "$VERIF/lists/partial"
+printf 'deb http://deb.debian.org/debian %s main contrib non-free-firmware\n' "$DEBIAN_VERSION" "$DEBIAN_VERSION-updates" > "$VERIF/sources.list"
+printf 'deb http://security.debian.org/debian-security %s-security main contrib non-free-firmware\n' "$DEBIAN_VERSION" >> "$VERIF/sources.list"
+APTV=(-o Dir::Etc::sourcelist="$VERIF/sources.list" -o Dir::Etc::sourceparts=- -o Dir::State::Lists="$VERIF/lists" -o APT::Get::List-Cleanup=0)
+apt-get "${APTV[@]}" update -qq
+for liste in config/package-lists/*.list.chroot; do
+  while read -r p; do
+    [[ -z $p || $p == \#* ]] && continue
+    if ! apt-cache "${APTV[@]}" show "$p" >/dev/null 2>&1; then
+      printf '\033[1;33mpaquet absent de Debian %s, retiré : %s\033[0m\n' "$DEBIAN_VERSION" "$p"
+      sed -i "s/^$p\$/# absent de Debian : $p/" "$liste"
+    fi
+  done < "$liste"
+done
+rm -rf "$VERIF"
+
+# --- 8. live-build ----------------------------------------------------------------------
 etape "Construction de l'image (une à deux heures)"
 lb clean --purge >/dev/null 2>&1 || true
 lb config
