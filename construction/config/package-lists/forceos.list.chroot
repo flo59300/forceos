@@ -113,3 +113,8 @@ php-zip
 
 # --- Navigateur (dépôt LibreWolf activé par le crochet 0100) ---
 extrepo
+
+# --- Outils utilisés par les scripts ForceOS ---
+jq
+psmisc
+python3

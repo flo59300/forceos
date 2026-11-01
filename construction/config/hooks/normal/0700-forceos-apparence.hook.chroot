@@ -38,6 +38,7 @@ fi
 # /usr/local/bin passe avant /usr/bin : « librewolf » lance Firejail
 ln -sf /usr/bin/firejail /usr/local/bin/librewolf
 if [ -f /usr/share/applications/librewolf.desktop ]; then
+  mkdir -p /usr/local/share/applications
   sed -E 's#^(Exec=)(/usr/bin/)?librewolf#\1/usr/local/bin/librewolf#' \
     /usr/share/applications/librewolf.desktop > /usr/local/share/applications/librewolf.desktop
 fi
