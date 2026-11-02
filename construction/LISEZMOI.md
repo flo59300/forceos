@@ -30,7 +30,7 @@ La clé démarre sur l'installateur Debian en français, préréglé. Restent po
 
 Système : Debian 13, noyau et microcodes à jour, mémoire d'échange compressée en RAM, journaux en mémoire, réglages de sécurité du noyau, mises à jour de sécurité Debian et LibreWolf automatiques, uniquement les traductions françaises (la règle dpkg s'applique aussi aux mises à jour).
 
-Bureau XFCE : thème Greybird aux couleurs FO, police Carlito, écran de démarrage bleu où se saisit la phrase du disque, écran de connexion LightDM, verrouillage après 2 minutes, huit lanceurs sur le bureau, raccourci discret Ctrl+Alt+Pause pour le verrouillage d'urgence. Les réglages passent par `/etc/xdg/forceos`, placé avant `/etc/xdg` : aucun fichier de paquet Debian n'est modifié.
+Bureau Cinnamon : thème Linux Mint (Mint-Y, compilé depuis les sources officielles par `outils/themes/themes-mint.sh`) avec barre du bas bleu FO, icônes Mint-Y, police Carlito, écran de démarrage bleu où se saisit la phrase du disque, écran de connexion LightDM à la manière de Mint (slick-greeter), verrouillage après 2 minutes, huit lanceurs sur le bureau, raccourci discret Ctrl+Alt+Pause pour le verrouillage d'urgence. Les réglages du bureau sont des valeurs par défaut du système (`/etc/dconf/db/local.d/00-forceos`) : aucun fichier de paquet Debian n'est modifié.
 
 FO Gestion et son environnement : PHP sans aucun port réseau, un processus par requête, version corrigée contre PHP2Shell exigée à la construction comme au démarrage ; MariaDB sans aucun port réseau, isolée par systemd et accessible par le seul compte Linux du militant ; Ollama avec le modèle qwen2.5:3b-instruct, écoutant sur 127.0.0.1 et interdit de réseau par systemd ; whisper.cpp et son modèle « small » pour la transcription.
 
@@ -44,7 +44,7 @@ Mises à jour : seules les mises à jour de sécurité Debian et LibreWolf, auto
 
 Clés USB : seules les clés autorisées par l'administrateur (fabricant, modèle et numéro de série) sont lisibles ; claviers, souris, imprimantes et téléphones ne sont pas concernés. Une clé inconnue est bloquée par le noyau, puis autorisée en une fois par « Autoriser une clé USB » (menu Système, mot de passe administrateur). Pensez à autoriser les clés de sauvegarde de la section.
 
-Navigateur : LibreWolf verrouillé (configuration et extensions bloquées, DNS chiffré et proxy interdits, effacement à la fermeture), isolé par Firejail qui lui masque le coffre, les données de FO Gestion et les documents de l'IA ; filtrage DNS CleanBrowsing « Adult » et pare-feu qui bloque tout autre serveur DNS.
+Navigateur : LibreWolf verrouillé (configuration et extensions bloquées, DNS chiffré et proxy interdits, effacement à la fermeture), lancé sans Firejail ; filtrage DNS CleanBrowsing « Adult » et pare-feu qui bloque tout autre serveur DNS.
 
 Administration : polkit ne reconnaît que root comme administrateur ; installer des logiciels, gérer les comptes, changer l'heure ou monter un disque interne demande son mot de passe.
 

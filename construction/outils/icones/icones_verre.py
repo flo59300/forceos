@@ -6,7 +6,7 @@ Conçu et développé par Florian Bigotte pour Force Ouvrière
 Chaque icône est une tuile de verre arrondie : fond dégradé dans une teinte
 de la charte FO, reflet dépoli sur la moitié haute, liseré lumineux, ombre
 portée douce, et un pictogramme blanc au trait. Le script écrit les SVG dans
-le thème d'icônes hicolor et les PNG aux tailles utilisées par XFCE.
+le thème d'icônes hicolor et les PNG aux tailles utilisées par le bureau.
 
     python3 icones_verre.py <dossier includes.chroot>
 """

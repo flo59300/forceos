@@ -4,11 +4,13 @@
 # Conçu et développé par Florian Bigotte pour Force Ouvrière
 #
 # Exécuté une seule fois par compte (marqueur dans ~/.config/forceos).
+# Le thème, le fond d'écran, la barre et les raccourcis du bureau Cinnamon
+# sont des réglages par défaut du système (/etc/dconf/db/local.d) : ce
+# script ne s'occupe que des dossiers et des lanceurs du militant.
 # Chaque réglage est indépendant : un échec n'empêche pas les suivants.
 # =====================================================================
 MARQUEUR=$HOME/.config/forceos/bureau-prepare
 [[ -f $MARQUEUR ]] && exit 0
-FONDS=/usr/share/backgrounds/forceos
 
 # --- Dossiers personnels en français -----------------------------------------
 # Noms de dossiers en français, même si la session a démarré dans une autre langue
@@ -16,7 +18,7 @@ LC_ALL=fr_FR.UTF-8 LANG=fr_FR.UTF-8 xdg-user-dirs-update --force
 DOCS=$(xdg-user-dir DOCUMENTS)
 mkdir -p "$DOCS/Bibliothèque_Syndicale" "$DOCS/Documents_IA"
 
-# --- Lanceurs du bureau approuvés (XFCE 4.18 et suivants) ----------------------
+# --- Lanceurs du bureau -------------------------------------------------------
 BUREAU=$(xdg-user-dir DESKTOP)
 mkdir -p "$BUREAU"
 # Lanceurs ForceOS copiés dans le vrai dossier du bureau, quel que soit son nom
@@ -36,60 +38,19 @@ Exec=/usr/libexec/forceos/installer-aide
 Icon=forceos-usb
 Terminal=false
 LANCEUR
-  chmod +x "$BUREAU/forceos-installer.desktop"
 fi
+# Lanceurs exécutables et marqués de confiance : Nemo les ouvre sans avertissement
 for f in "$BUREAU"/forceos-*.desktop; do
   [[ -f $f ]] || continue
   chmod u+x "$f"
-  gio set -t string "$f" metadata::xfce-exe-checksum "$(sha256sum "$f" | cut -d' ' -f1)"
+  gio set -t string "$f" metadata::trusted true 2>/dev/null
 done
 
-# --- Attente du gestionnaire de bureau et du tableau de bord -----------------
-for _ in $(seq 1 30); do
-  pgrep -u "$UID" -x xfdesktop >/dev/null && pgrep -u "$UID" -x xfce4-panel >/dev/null && break
-  sleep 1
-done
-sleep 2
-
-# --- Fond d'écran sur chaque écran branché -----------------------------------
-while read -r nom largeur; do
-  [[ -n $nom ]] || continue
-  image=$FONDS/forceos-fond-1920x1080.png
-  (( largeur > 2560 )) && image=$FONDS/forceos-fond-3840x2160.png
-  for ws in 0 1; do
-    base=/backdrop/screen0/monitor$nom/workspace$ws
-    xfconf-query -c xfce4-desktop -p "$base/last-image" -n -t string -s "$image"
-    xfconf-query -c xfce4-desktop -p "$base/image-style" -n -t int -s 5   # zoom
-  done
-done < <(xrandr --listmonitors 2>/dev/null | awk 'NR>1 {split($3,d,"/"); print $NF, d[1]}')
-
-# --- Tableau de bord en bleu Force Ouvrière ----------------------------------
-for p in $(xfconf-query -c xfce4-panel -l 2>/dev/null | grep -oE '^/panels/panel-[0-9]+' | sort -u); do
-  xfconf-query -c xfce4-panel -p "$p/background-style" -n -t uint -s 1
-  xfconf-query -c xfce4-panel -p "$p/background-rgba" -n \
-    -t double -t double -t double -t double -s 0.0 -s 0.1686 -s 0.4980 -s 0.82
-done
-
-# --- Trousseau sécurisé : services GNOME lancés avec XFCE ----------------------
-# Sans eux, gnome-keyring ne démarre pas et FO Gestion ne peut pas protéger sa clé.
-xfconf-query -c xfce4-session -p /compat/LaunchGNOME -n -t bool -s true
+# --- Trousseau sécurisé -------------------------------------------------------
+# Sans lui, FO Gestion ne peut pas protéger sa clé de chiffrement.
 if ! busctl --user status org.freedesktop.secrets >/dev/null 2>&1; then
   gnome-keyring-daemon --start --components=secrets >/dev/null 2>&1 || true
 fi
-
-# --- Bureau : grandes icônes « verre », étiquettes lisibles ---------------------
-xfconf-query -c xfce4-desktop -p /desktop-icons/icon-size -n -t uint -s 72
-xfconf-query -c xfce4-desktop -p /desktop-icons/tooltip-size -n -t double -s 96
-xfconf-query -c xfce4-desktop -p /desktop-icons/show-thumbnails -n -t bool -s true
-for p in $(xfconf-query -c xfce4-panel -l 2>/dev/null | grep -oE '^/panels/panel-[0-9]+' | sort -u); do
-  xfconf-query -c xfce4-panel -p "$p/size" -n -t uint -s 40
-  xfconf-query -c xfce4-panel -p "$p/icon-size" -n -t uint -s 28
-done
-
-# --- Raccourci discret du bouton d'urgence : Ctrl + Alt + Pause --------------
-xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Primary><Alt>Pause' -n -t string -s forceos-urgence
-# Verrouillage classique : Super + L
-xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Super>l' -n -t string -s 'xfce4-screensaver-command --lock'
 
 mkdir -p "$(dirname "$MARQUEUR")"
 touch "$MARQUEUR"

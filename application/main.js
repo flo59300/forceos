@@ -54,7 +54,7 @@ const BASE           = 'forceos_gestion';
 const OLLAMA_URL     = 'http://127.0.0.1:11434';
 const CREDITS        = 'Conçu et développé par Florian Bigotte';
 
-// Sous XFCE, Chromium ne détecte pas toujours le trousseau et se rabat sur
+// Hors de GNOME (Cinnamon), Chromium ne détecte pas toujours le trousseau et se rabat sur
 // un stockage en clair : libsecret est imposé (avant l'événement « ready »).
 app.commandLine.appendSwitch('password-store', 'gnome-libsecret');
 app.setPath('userData', path.join(app.getPath('appData'), 'ForceOS'));
@@ -111,7 +111,7 @@ function verifierUtilisateurAutorise() {
 
 /** Clé maîtresse : générée au premier lancement, protégée par le trousseau. */
 /**
- * Trousseau GNOME prêt à l'emploi. Sous XFCE, le service peut ne pas être
+ * Trousseau GNOME prêt à l'emploi. Sous Cinnamon, le service peut ne pas être
  * enregistré sur le bus de la session : on le démarre (sans effet s'il tourne
  * déjà), puis on laisse à Chromium le temps d'initialiser son stockage chiffré.
  */

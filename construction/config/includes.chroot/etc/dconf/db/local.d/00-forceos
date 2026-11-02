@@ -1,0 +1,71 @@
+# =====================================================================
+# ForceOS : réglages par défaut du bureau Cinnamon (thème Linux Mint)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# Valeurs par défaut pour tous les comptes ; compilées par « dconf update »
+# (crochet 0700). Chaque militant peut ensuite les ajuster.
+# =====================================================================
+
+[org/cinnamon/desktop/interface]
+gtk-theme='Mint-Y-Blue'
+icon-theme='Mint-Y-Blue'
+cursor-theme='Bibata-Modern-Classic'
+font-name='Carlito 11'
+clock-show-date=true
+
+[org/gnome/desktop/interface]
+gtk-theme='Mint-Y-Blue'
+icon-theme='Mint-Y-Blue'
+cursor-theme='Bibata-Modern-Classic'
+font-name='Carlito 11'
+document-font-name='Carlito 11'
+monospace-font-name='DejaVu Sans Mono 10'
+
+[org/cinnamon/desktop/wm/preferences]
+theme='Mint-Y'
+titlebar-font='Carlito Bold 11'
+button-layout=':minimize,maximize,close'
+
+[org/cinnamon/theme]
+name='ForceOS'
+
+[org/cinnamon/desktop/background]
+picture-uri='file:///usr/share/backgrounds/forceos/forceos-fond-3840x2160.png'
+picture-options='zoom'
+
+[org/cinnamon]
+panels-height=['1:40']
+favorite-apps=['forceos-fo-gestion.desktop', 'librewolf.desktop', 'org.gnome.Evince.desktop', 'libreoffice-writer.desktop', 'libreoffice-calc.desktop', 'nemo.desktop', 'cinnamon-settings.desktop']
+
+[org/cinnamon/desktop/keybindings]
+custom-list=['custom0']
+
+[org/cinnamon/desktop/keybindings/custom-keybindings/custom0]
+name='Verrouillage d’urgence ForceOS'
+command='forceos-urgence'
+binding=['<Primary><Alt>Pause']
+
+[org/cinnamon/desktop/keybindings/media-keys]
+screensaver=['<Control><Alt>l', '<Super>l', 'XF86ScreenSaver']
+
+[org/cinnamon/desktop/screensaver]
+lock-enabled=true
+lock-delay=uint32 0
+
+[org/cinnamon/desktop/session]
+idle-delay=uint32 600
+
+[org/cinnamon/desktop/privacy]
+remember-recent-files=false
+
+[org/cinnamon/desktop/sound]
+event-sounds=false
+
+[org/nemo/desktop]
+computer-icon-visible=false
+home-icon-visible=false
+trash-icon-visible=true
+volumes-visible=true
+font='Carlito Bold 11'
+
+[org/nemo/preferences]
+show-image-thumbnails='local-only'

@@ -94,6 +94,10 @@ install -D -m 0755 "$SRC/build/bin/whisper-cli" "$INC/usr/lib/forceos/whisper/wh
 telecharger "$WHISPER_MODELE_URL" "$CACHE/ggml-small.bin" sha1 "$WHISPER_MODELE_SHA1"
 install -D -m 0644 "$CACHE/ggml-small.bin" "$INC/usr/share/forceos/whisper/ggml-small.bin"
 
+# --- 4 bis. Thème Linux Mint (bureau Cinnamon) ------------------------------------------
+etape "Thème Linux Mint (Mint-Y)"
+"$RACINE/outils/themes/themes-mint.sh" "$CACHE" "$INC"
+
 # --- 5. Modèle d'IA -------------------------------------------------------------------
 # Téléchargé une fois sur la machine de construction avec le binaire Ollama vérifié,
 # puis copié dans l'image : le poste n'a jamais besoin d'Internet pour l'IA.

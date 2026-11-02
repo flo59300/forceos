@@ -5,7 +5,7 @@
  * Conçu et développé par Florian Bigotte pour Force Ouvrière
  *
  * Le texte de chaque document (PDF, PDF scanné par OCR, Word, LibreOffice,
- * texte) est extrait par lib/documents.js, dans un bac à sable Firejail, puis
+ * texte) est extrait par lib/documents.js, sur le poste, puis
  * transmis à FO Gestion qui l'indexe avec sa propre recherche. Le texte
  * extrait est gardé en cache, par empreinte du fichier : un PDF scanné n'est
  * passé à l'OCR qu'une seule fois, même après un redémarrage.

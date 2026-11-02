@@ -1,0 +1,7 @@
+[Nemo Action]
+Name=Rendre le PDF consultable (OCR)
+Comment=Reconnaître le texte d'un PDF scanné, en français, pour pouvoir le rechercher et le copier
+Exec=forceos-ocr-pdf %F
+Icon-Name=document-edit-symbolic
+Selection=notnone
+Extensions=pdf;

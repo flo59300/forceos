@@ -1,6 +1,7 @@
 # ForceOS : paquets de l'étape 7 (apparence et outils), Florian Bigotte
-greybird-gtk-theme
-elementary-xfce-icon-theme
+mint-y-icons
+mint-x-icons
+bibata-cursor-theme
 plymouth
 plymouth-themes
 ocrmypdf

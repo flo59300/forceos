@@ -91,7 +91,6 @@
         "poppler-utils",
         "tesseract-ocr",
         "tesseract-ocr-fra",
-        "firejail",
         "pkexec",
         "libgtk-3-0t64 | libgtk-3-0",
         "libatspi2.0-0t64 | libatspi2.0-0",

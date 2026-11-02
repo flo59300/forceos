@@ -1,0 +1,7 @@
+[Nemo Action]
+Name=Ajouter aux documents de l'IA
+Comment=Copier dans Documents_IA pour que l'assistant de FO Gestion puisse le consulter
+Exec=forceos-ajouter-documents-ia %F
+Icon-Name=accessories-dictionary
+Selection=notnone
+Extensions=pdf;docx;odt;txt;md;

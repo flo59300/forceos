@@ -24,19 +24,25 @@ keyboard-configuration
 tzdata
 sudo
 
-# --- Bureau XFCE ---
+# --- Bureau Cinnamon (thème Linux Mint) ---
 xorg
-xfce4
-xfce4-goodies
-xfce4-screensaver
+cinnamon-core
+cinnamon-l10n
+nemo-fileroller
+file-roller
+gnome-terminal
+gnome-calculator
+gnome-screenshot
+gnome-system-monitor
+xdg-desktop-portal-gtk
+dconf-cli
 lightdm
-lightdm-gtk-greeter
+slick-greeter
 network-manager-gnome
 pipewire-audio
 pavucontrol
 gvfs-backends
 udisks2
-thunar-archive-plugin
 xdg-user-dirs
 zenity
 libnotify-bin
@@ -81,8 +87,6 @@ avahi-daemon
 
 # --- Sécurité ---
 nftables
-firejail
-firejail-profiles
 clamav
 clamtk
 clamav-freshclam

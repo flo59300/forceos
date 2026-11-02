@@ -74,7 +74,7 @@ cat <<TEXTE
   Disque chiffré          : ${CHIFFRE}
 
   Ce qui va changer sur ce PC :
-   - bureau XFCE aux couleurs FO et écran de connexion ForceOS ;
+   - bureau Cinnamon avec le thème Linux Mint aux couleurs FO et écran de connexion ForceOS ;
    - FO Gestion, l'IA locale et la transcription audio installées ;
    - navigateur LibreWolf verrouillé, filtrage DNS, pare-feu ;
    - clés USB inconnues bloquées ;
@@ -127,7 +127,7 @@ while read -r p; do
   if apt-cache show "$p" >/dev/null 2>&1; then LISTE+=("$p"); else info "paquet indisponible, ignoré : $p"; fi
 done < <(grep -hvE '^\s*(#|$)' "$CONSTR"/config/package-lists/*.list.chroot | sort -u)
 apt-get install -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold \
-  "${LISTE[@]}" curl zstd cmake build-essential git ca-certificates
+  "${LISTE[@]}" curl zstd cmake build-essential git ca-certificates python3-libsass
 
 # --- 2. Fichiers ForceOS ---------------------------------------------------------------
 bleu "2/8 Fichiers ForceOS"
@@ -174,6 +174,8 @@ apt-get install -y "$CACHE/fo-gestion.deb"
 
 # --- 6. Réglages du système (mêmes scripts que pour l'image ISO) ------------------------
 bleu "6/8 Réglages du système"
+info "thème Linux Mint"
+"$CONSTR/outils/themes/themes-mint.sh" "$CACHE" /
 for h in 0100-forceos-depots 0200-forceos-francais 0300-forceos-services 0400-forceos-securite 0500-forceos-ia 0700-forceos-apparence; do
   info "$h"
   sh "$CONSTR/config/hooks/normal/$h.hook.chroot"
@@ -210,7 +212,7 @@ cp -rn /etc/skel/.config/. "$MAISON/.config/"
 chown -R "$MILITANT:$MILITANT" "$BUREAU" "$MAISON/Modèles" "$MAISON/Documents" "$MAISON/.config"
 chmod 0755 "$BUREAU"/forceos-*.desktop
 rm -f "$MAISON/.config/forceos/bureau-prepare"
-printf '[Desktop]\nSession=xfce\n' > "$MAISON/.dmrc"; chown "$MILITANT:$MILITANT" "$MAISON/.dmrc"
+printf '[Desktop]\nSession=cinnamon\n' > "$MAISON/.dmrc"; chown "$MILITANT:$MILITANT" "$MAISON/.dmrc"
 
 # Le militant n'est plus administrateur
 gpasswd -d "$MILITANT" sudo 2>/dev/null || true

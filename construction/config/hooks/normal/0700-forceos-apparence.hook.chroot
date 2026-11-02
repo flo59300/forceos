@@ -1,6 +1,6 @@
 #!/bin/sh
 # =====================================================================
-# ForceOS : identité visuelle, navigateur isolé et nettoyage des traces
+# ForceOS : identité visuelle, bureau Cinnamon, navigateur et nettoyage des traces
 # Conçu et développé par Florian Bigotte pour Force Ouvrière
 # =====================================================================
 set -e
@@ -12,6 +12,15 @@ chmod 0755 /etc/skel/Bureau/*.desktop
 
 # --- Icônes -------------------------------------------------------------------
 gtk-update-icon-cache -f -q /usr/share/icons/hicolor || true
+
+# --- Bureau Cinnamon : thème Linux Mint et réglages par défaut ForceOS ------------
+for t in Mint-Y Mint-Y-Blue Mint-Y-Dark-Blue ForceOS; do
+  test -f "/usr/share/themes/$t/index.theme" || { echo "thème $t absent" >&2; exit 1; }
+done
+dconf update
+# Cinnamon devient la session par défaut ; l'ancien écran de connexion est retiré
+update-alternatives --set x-session-manager /usr/bin/cinnamon-session 2>/dev/null || true
+apt-get purge -y lightdm-gtk-greeter 2>/dev/null || true
 
 # --- Démarrage : thème Plymouth ForceOS (logo sur pastille blanche) ---------
 # La phrase de chiffrement du disque est saisie sur cet écran.
@@ -34,23 +43,10 @@ if [ -d /usr/share/plymouth/themes/spinner ]; then
   plymouth-set-default-theme forceos
 fi
 
-# --- LibreWolf isolé par Firejail ---------------------------------------------
-# /usr/local/bin passe avant /usr/bin : « librewolf » lance Firejail.
-# Petit script avec chemins complets plutôt qu'un lien vers firejail : la
-# recherche automatique du vrai programme échouait (« cannot find the program »).
-rm -f /usr/local/bin/librewolf
-cat > /usr/local/bin/librewolf <<'SCRIPT'
-#!/bin/sh
-# ForceOS : LibreWolf isolé par Firejail (Florian Bigotte)
-exec /usr/bin/firejail --profile=librewolf /usr/bin/librewolf "$@"
-SCRIPT
-chmod 0755 /usr/local/bin/librewolf
+# --- Navigateur LibreWolf -------------------------------------------------------
+# Lancé directement (sans Firejail) ; ancien lanceur intermédiaire retiré
+rm -f /usr/local/bin/librewolf /usr/local/share/applications/librewolf.desktop
 test -x /usr/bin/librewolf || { echo "LibreWolf absent de /usr/bin" >&2; exit 1; }
-if [ -f /usr/share/applications/librewolf.desktop ]; then
-  mkdir -p /usr/local/share/applications
-  sed -E 's#^(Exec=)(/usr/bin/)?librewolf#\1/usr/local/bin/librewolf#' \
-    /usr/share/applications/librewolf.desktop > /usr/local/share/applications/librewolf.desktop
-fi
 /usr/libexec/forceos/librewolf-politiques
 update-alternatives --set x-www-browser /usr/bin/librewolf 2>/dev/null || true
 

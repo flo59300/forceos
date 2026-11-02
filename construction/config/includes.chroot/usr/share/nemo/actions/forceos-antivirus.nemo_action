@@ -1,0 +1,7 @@
+[Nemo Action]
+Name=Analyser avec l'antivirus
+Comment=Rechercher des virus dans les fichiers ou la clé USB sélectionnés (ClamAV)
+Exec=clamtk %F
+Icon-Name=security-high
+Selection=notnone
+Extensions=any;

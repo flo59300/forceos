@@ -5,7 +5,7 @@
 #
 # Le document d'origine n'est jamais modifié : le résultat est enregistré à
 # côté, sous le nom « <document> (OCR).pdf ». Le traitement se fait sur le
-# poste, dans un bac à sable sans réseau.
+# poste, sans rien envoyer sur Internet.
 # =====================================================================
 set -uo pipefail
 TITRE="Reconnaissance de texte (OCR)"
@@ -16,8 +16,7 @@ for f in "$@"; do
   [[ -f $f ]] || continue
   sortie="${f%.*} (OCR).pdf"
   if [[ -e $sortie ]]; then erreurs+="\n• $(basename "$f") : « $(basename "$sortie") » existe déjà"; continue; fi
-  if firejail --quiet --noprofile --net=none --caps.drop=all --nonewprivs --seccomp -- \
-       ocrmypdf --language fra --skip-text --rotate-pages --deskew --output-type pdf \
+  if ocrmypdf --language fra --skip-text --rotate-pages --deskew --output-type pdf \
        --jobs "$(nproc)" "$f" "$sortie" 2>/dev/null \
        | zenity --progress --pulsate --auto-close --no-cancel --title="$TITRE" \
            --text="Analyse de « $(basename "$f") »…\nComptez quelques secondes par page." 2>/dev/null

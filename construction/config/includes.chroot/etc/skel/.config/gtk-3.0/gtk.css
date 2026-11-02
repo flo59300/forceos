@@ -16,6 +16,5 @@ button.suggested-action { background-color: #002B7F; background-image: none; col
 
 /* Bureau : noms des icônes lisibles sur le fond clair (texte bleu nuit,
    halo blanc), sélection en pastille bleue arrondie */
-XfdesktopIconView.view { color: #0B1B45; text-shadow: 0 0 3px #FFFFFF, 0 1px 2px #FFFFFF; font-weight: bold; }
-XfdesktopIconView.view:active, XfdesktopIconView.view:selected { background-color: rgba(0, 43, 127, 0.85); color: #FFFFFF; text-shadow: none; border-radius: 8px; }
-XfdesktopIconView.label { color: #0B1B45; }
+.nemo-desktop.nemo-canvas-item { color: #0B1B45; text-shadow: 0 0 3px #FFFFFF, 0 1px 2px #FFFFFF; font-weight: bold; }
+.nemo-desktop.nemo-canvas-item:selected { background-color: rgba(0, 43, 127, 0.85); color: #FFFFFF; text-shadow: none; border-radius: 8px; }

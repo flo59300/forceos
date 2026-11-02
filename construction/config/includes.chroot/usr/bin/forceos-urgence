@@ -14,7 +14,7 @@ ACTION_FINALE=verrouiller
 [[ -r /etc/forceos/urgence.conf ]] && . /etc/forceos/urgence.conf
 
 # 1. Plus rien de visible à l'écran
-xfce4-screensaver-command --lock >/dev/null 2>&1 &
+cinnamon-screensaver-command --lock >/dev/null 2>&1 &
 
 # 2. FO Gestion : signal prévu par l'application (arrêt de PHP, sortie immédiate).
 #    Seul le processus principal est visé, pas ses processus de rendu.

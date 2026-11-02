@@ -12,8 +12,12 @@
 set -uo pipefail
 TITRE="Mode présentation"
 ETAT=${XDG_RUNTIME_DIR:-/tmp}/forceos-presentation.etat
-q() { xfconf-query -c "$1" -p "$2" 2>/dev/null; }
-s() { xfconf-query -c "$1" -p "$2" -n -t "$3" -s "$4" 2>/dev/null; }
+# Réglages du bureau Cinnamon
+q() { gsettings get "$1" "$2" 2>/dev/null; }
+s() { gsettings set "$1" "$2" "$3" 2>/dev/null; }
+NOTIF=org.cinnamon.desktop.notifications
+VEILLE=org.cinnamon.desktop.screensaver
+SESSION=org.cinnamon.desktop.session
 
 # ---------------------------------------------------------------------
 # Désactivation : retour à l'état mémorisé
@@ -21,10 +25,9 @@ s() { xfconf-query -c "$1" -p "$2" -n -t "$3" -s "$4" 2>/dev/null; }
 if [[ -f $ETAT ]]; then
   # shellcheck source=/dev/null
   source "$ETAT"
-  s xfce4-notifyd /do-not-disturb bool "${ancien_dnd:-false}"
-  s xfce4-screensaver /saver/enabled bool "${ancien_veille:-true}"
-  s xfce4-screensaver /lock/enabled bool "${ancien_verrou:-true}"
-  s xfce4-power-manager /xfce4-power-manager/presentation-mode bool false
+  s $NOTIF display-notifications "${ancien_notif:-true}"
+  s $SESSION idle-delay "${ancien_veille:-uint32 600}"
+  s $VEILLE lock-enabled "${ancien_verrou:-true}"
   xset s on +dpms 2>/dev/null
   [[ -n ${externe:-} ]] && xrandr --output "$externe" --off 2>/dev/null
   [[ -n ${interne:-} ]] && xrandr --output "$interne" --auto --primary 2>/dev/null
@@ -71,18 +74,17 @@ fi
 
 # Mémorisation de l'état actuel pour le rétablir ensuite
 {
-  printf 'ancien_dnd=%q\n' "$(q xfce4-notifyd /do-not-disturb || echo false)"
-  printf 'ancien_veille=%q\n' "$(q xfce4-screensaver /saver/enabled || echo true)"
-  printf 'ancien_verrou=%q\n' "$(q xfce4-screensaver /lock/enabled || echo true)"
+  printf 'ancien_notif=%q\n' "$(q $NOTIF display-notifications || echo true)"
+  printf 'ancien_veille=%q\n' "$(q $SESSION idle-delay || echo 'uint32 600')"
+  printf 'ancien_verrou=%q\n' "$(q $VEILLE lock-enabled || echo true)"
   printf 'interne=%q\nexterne=%q\nmode=%q\n' "$interne" "${externe:-}" "$mode"
 } > "$ETAT"
 chmod 0600 "$ETAT"
 
 # Notifications coupées, veille et verrouillage suspendus
-s xfce4-notifyd /do-not-disturb bool true
-s xfce4-screensaver /saver/enabled bool false
-s xfce4-screensaver /lock/enabled bool false
-s xfce4-power-manager /xfce4-power-manager/presentation-mode bool true
+s $NOTIF display-notifications false
+s $SESSION idle-delay 0
+s $VEILLE lock-enabled false
 xset s off -dpms 2>/dev/null
 
 zenity --info --title="$TITRE" --width=440 \
