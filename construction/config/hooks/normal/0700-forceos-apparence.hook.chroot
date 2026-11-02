@@ -35,8 +35,17 @@ if [ -d /usr/share/plymouth/themes/spinner ]; then
 fi
 
 # --- LibreWolf isolé par Firejail ---------------------------------------------
-# /usr/local/bin passe avant /usr/bin : « librewolf » lance Firejail
-ln -sf /usr/bin/firejail /usr/local/bin/librewolf
+# /usr/local/bin passe avant /usr/bin : « librewolf » lance Firejail.
+# Petit script avec chemins complets plutôt qu'un lien vers firejail : la
+# recherche automatique du vrai programme échouait (« cannot find the program »).
+rm -f /usr/local/bin/librewolf
+cat > /usr/local/bin/librewolf <<'SCRIPT'
+#!/bin/sh
+# ForceOS : LibreWolf isolé par Firejail (Florian Bigotte)
+exec /usr/bin/firejail --profile=librewolf /usr/bin/librewolf "$@"
+SCRIPT
+chmod 0755 /usr/local/bin/librewolf
+test -x /usr/bin/librewolf || { echo "LibreWolf absent de /usr/bin" >&2; exit 1; }
 if [ -f /usr/share/applications/librewolf.desktop ]; then
   mkdir -p /usr/local/share/applications
   sed -E 's#^(Exec=)(/usr/bin/)?librewolf#\1/usr/local/bin/librewolf#' \
