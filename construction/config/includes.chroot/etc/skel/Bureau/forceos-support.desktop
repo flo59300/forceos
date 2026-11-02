@@ -3,6 +3,6 @@ Type=Application
 Name=Contacter le support (Florian Bigotte)
 Comment=Autoriser temporairement l'assistance à distance de Florian Bigotte
 Exec=forceos-support
-Icon=help-browser
+Icon=forceos-support
 Terminal=false
 StartupNotify=true

@@ -3,6 +3,6 @@ Type=Application
 Name=FO Gestion
 Comment=Adhérents, finances, assistant IA (Florian Bigotte)
 Exec="/opt/FO Gestion/forceos-fo-gestion" %U
-Icon=forceos
+Icon=forceos-gestion
 Terminal=false
 StartupNotify=true

@@ -3,6 +3,6 @@ Type=Application
 Name=Verrouillage rapide
 Comment=Verrouiller le poste
 Exec=forceos-urgence
-Icon=system-lock-screen
+Icon=forceos-verrouillage
 Terminal=false
 StartupNotify=true

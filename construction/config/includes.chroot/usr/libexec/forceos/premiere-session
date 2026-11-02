@@ -59,7 +59,7 @@ done < <(xrandr --listmonitors 2>/dev/null | awk 'NR>1 {split($3,d,"/"); print $
 for p in $(xfconf-query -c xfce4-panel -l 2>/dev/null | grep -oE '^/panels/panel-[0-9]+' | sort -u); do
   xfconf-query -c xfce4-panel -p "$p/background-style" -n -t uint -s 1
   xfconf-query -c xfce4-panel -p "$p/background-rgba" -n \
-    -t double -t double -t double -t double -s 0.0 -s 0.1686 -s 0.4980 -s 1.0
+    -t double -t double -t double -t double -s 0.0 -s 0.1686 -s 0.4980 -s 0.82
 done
 
 # --- Trousseau sécurisé : services GNOME lancés avec XFCE ----------------------
@@ -68,6 +68,15 @@ xfconf-query -c xfce4-session -p /compat/LaunchGNOME -n -t bool -s true
 if ! busctl --user status org.freedesktop.secrets >/dev/null 2>&1; then
   gnome-keyring-daemon --start --components=secrets >/dev/null 2>&1 || true
 fi
+
+# --- Bureau : grandes icônes « verre », étiquettes lisibles ---------------------
+xfconf-query -c xfce4-desktop -p /desktop-icons/icon-size -n -t uint -s 72
+xfconf-query -c xfce4-desktop -p /desktop-icons/tooltip-size -n -t double -s 96
+xfconf-query -c xfce4-desktop -p /desktop-icons/show-thumbnails -n -t bool -s true
+for p in $(xfconf-query -c xfce4-panel -l 2>/dev/null | grep -oE '^/panels/panel-[0-9]+' | sort -u); do
+  xfconf-query -c xfce4-panel -p "$p/size" -n -t uint -s 40
+  xfconf-query -c xfce4-panel -p "$p/icon-size" -n -t uint -s 28
+done
 
 # --- Raccourci discret du bouton d'urgence : Ctrl + Alt + Pause --------------
 xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Primary><Alt>Pause' -n -t string -s forceos-urgence

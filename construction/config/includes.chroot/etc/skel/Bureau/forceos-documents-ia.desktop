@@ -3,6 +3,6 @@ Type=Application
 Name=Documents de l'IA
 Comment=Documents consultés par l'assistant de FO Gestion
 Exec=forceos-dossier documents-ia
-Icon=folder-documents
+Icon=forceos-ia
 Terminal=false
 StartupNotify=true

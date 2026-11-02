@@ -3,6 +3,6 @@ Type=Application
 Name=Autoriser une clé USB
 Comment=Autoriser une clé USB bloquée (mot de passe administrateur)
 Exec=forceos-usb-autoriser
-Icon=drive-removable-media-usb
+Icon=forceos-usb
 Terminal=false
 Categories=System;Settings;

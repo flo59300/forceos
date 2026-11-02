@@ -3,6 +3,6 @@ Type=Application
 Name=Bibliothèque syndicale
 Comment=Livres numériques du syndicat (Foliate)
 Exec=forceos-dossier bibliotheque
-Icon=accessories-dictionary
+Icon=forceos-bibliotheque
 Terminal=false
 StartupNotify=true

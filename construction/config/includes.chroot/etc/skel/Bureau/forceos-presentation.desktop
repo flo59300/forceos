@@ -3,6 +3,6 @@ Type=Application
 Name=Mode présentation
 Comment=Projeter sans notifications ni mise en veille
 Exec=forceos-presentation
-Icon=video-display
+Icon=forceos-presentation
 Terminal=false
 StartupNotify=true

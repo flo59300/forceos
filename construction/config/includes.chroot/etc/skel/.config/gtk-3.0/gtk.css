@@ -13,3 +13,9 @@ check:checked, radio:checked { background-color: #002B7F; background-image: none
 entry:focus, textview:focus { border-color: #002B7F; box-shadow: inset 0 0 0 1px #002B7F; }
 button.destructive-action { background-color: #E2001A; background-image: none; color: #FFFFFF; border-color: #b30015; }
 button.suggested-action { background-color: #002B7F; background-image: none; color: #FFFFFF; border-color: #001d57; }
+
+/* Bureau : noms des icônes lisibles sur le fond clair (texte bleu nuit,
+   halo blanc), sélection en pastille bleue arrondie */
+XfdesktopIconView.view { color: #0B1B45; text-shadow: 0 0 3px #FFFFFF, 0 1px 2px #FFFFFF; font-weight: bold; }
+XfdesktopIconView.view:active, XfdesktopIconView.view:selected { background-color: rgba(0, 43, 127, 0.85); color: #FFFFFF; text-shadow: none; border-radius: 8px; }
+XfdesktopIconView.label { color: #0B1B45; }

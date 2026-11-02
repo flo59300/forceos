@@ -1,0 +1,132 @@
+/* =====================================================================
+   ForceOS : effet « verre » de FO Gestion
+   Conçu et développé par Florian Bigotte pour Force Ouvrière
+   Tuiles de pictogrammes en verre, cartes qui se soulèvent, barre de
+   navigation et actions rapides retravaillées. Clair et sombre.
+   ===================================================================== */
+:root {
+  --verre-bleu-1: #2f6bea; --verre-bleu-2: #002b7f;
+  --verre-nuit-1: #3a4a86; --verre-nuit-2: #101c45;
+  --verre-indigo-1: #6c5ce7; --verre-indigo-2: #2b1c8f;
+  --verre-rouge-1: #ff4d5e; --verre-rouge-2: #b00014;
+  --verre-vert-1: #1fb58f; --verre-vert-2: #0b6b55;
+  --verre-ombre: 0 6px 14px -6px rgb(0 27 90 / .45);
+  --carte-ombre: 0 1px 2px rgb(14 23 38 / .05), 0 8px 24px -14px rgb(0 43 127 / .28);
+  --carte-ombre-survol: 0 2px 4px rgb(14 23 38 / .06), 0 18px 36px -16px rgb(0 43 127 / .42);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --verre-ombre: 0 6px 16px -6px rgb(0 0 0 / .7);
+    --carte-ombre: 0 1px 2px rgb(0 0 0 / .3), 0 10px 26px -14px rgb(0 0 0 / .7);
+    --carte-ombre-survol: 0 2px 4px rgb(0 0 0 / .35), 0 18px 38px -16px rgb(0 0 0 / .85);
+  }
+}
+
+/* Fond : léger halo aux couleurs FO derrière le contenu */
+body {
+  background-image:
+    radial-gradient(60rem 30rem at 100% -10%, color-mix(in srgb, var(--brand) 9%, transparent), transparent 70%),
+    radial-gradient(40rem 24rem at -10% 110%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 70%);
+  background-attachment: fixed;
+}
+
+/* --- Tuile de verre ------------------------------------------------- */
+.fo-verre {
+  --v1: var(--verre-bleu-1); --v2: var(--verre-bleu-2);
+  position: relative; isolation: isolate; flex-shrink: 0;
+  display: grid; place-items: center;
+  inline-size: 3rem; block-size: 3rem; border-radius: 0.95rem;
+  color: #fff;
+  background: linear-gradient(160deg, var(--v1), var(--v2));
+  box-shadow: var(--verre-ombre), inset 0 1px 0 rgb(255 255 255 / .55), inset 0 -1px 0 rgb(0 0 0 / .18);
+  overflow: hidden;
+}
+.fo-verre::before {            /* reflet dépoli de la moitié haute */
+  content: ""; position: absolute; inset: 0 0 46% 0; z-index: -1;
+  background: linear-gradient(rgb(255 255 255 / .5), rgb(255 255 255 / .06));
+  border-radius: 0 0 50% 50% / 0 0 30% 30%;
+}
+.fo-verre::after {             /* lueur basse */
+  content: ""; position: absolute; inset: 55% 10% -30% 10%; z-index: -1;
+  background: radial-gradient(closest-side, rgb(255 255 255 / .3), transparent);
+}
+.fo-verre svg { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .3)); stroke-width: 1.9; }
+.fo-entete .fo-verre { inline-size: 4rem; block-size: 4rem; border-radius: 1.25rem; }
+
+[data-teinte="nuit"]   { --v1: var(--verre-nuit-1);   --v2: var(--verre-nuit-2); }
+[data-teinte="indigo"] { --v1: var(--verre-indigo-1); --v2: var(--verre-indigo-2); }
+[data-teinte="rouge"]  { --v1: var(--verre-rouge-1);  --v2: var(--verre-rouge-2); }
+[data-teinte="vert"]   { --v1: var(--verre-vert-1);   --v2: var(--verre-vert-2); }
+
+/* --- En-tête de page et titres de thèmes ---------------------------- */
+.fo-entete { display: flex; align-items: center; gap: 1rem; }
+.fo-titre-theme { display: flex; align-items: center; gap: .55rem; }
+.fo-titre-theme svg {
+  box-sizing: content-box; padding: .3rem; border-radius: .55rem; color: #fff;
+  background: linear-gradient(160deg, var(--v1, var(--verre-bleu-1)), var(--v2, var(--verre-bleu-2)));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .45);
+}
+.fo-titre-theme::after {
+  content: ""; flex: 1; block-size: 1px; margin-inline-start: .5rem;
+  background: linear-gradient(90deg, var(--line), transparent);
+}
+
+/* --- Cartes ---------------------------------------------------------- */
+.todo-card {
+  box-shadow: var(--carte-ombre);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+a.todo-card:hover { transform: translateY(-2px); box-shadow: var(--carte-ombre-survol); }
+.fo-carte { align-items: center; }
+.fo-carte .fo-fleche { transition: transform .18s ease; }
+.fo-carte:hover .fo-fleche { transform: translateX(3px); }
+.card { box-shadow: var(--carte-ombre); }
+
+/* --- Actions rapides : pictogramme dans une pastille de verre -------- */
+.quick-action {
+  box-shadow: var(--carte-ombre);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.quick-action:hover { transform: translateY(-2px); box-shadow: var(--carte-ombre-survol); }
+.quick-action > svg {
+  box-sizing: content-box; padding: .55rem; border-radius: .85rem; color: #fff;
+  background: linear-gradient(160deg, var(--verre-bleu-1), var(--verre-bleu-2));
+  box-shadow: var(--verre-ombre), inset 0 1px 0 rgb(255 255 255 / .5);
+}
+.quick-action-main {
+  background: linear-gradient(135deg, #1749b8, #002b7f 60%, #001a52);
+  border-color: transparent;
+  box-shadow: 0 14px 30px -14px rgb(0 43 127 / .75), inset 0 1px 0 rgb(255 255 255 / .25);
+}
+.quick-action-main > svg { background: rgb(255 255 255 / .16); box-shadow: inset 0 1px 0 rgb(255 255 255 / .45); }
+
+/* --- Navigation latérale : pictogramme en pastille ------------------- */
+.nav-link > svg {
+  box-sizing: content-box; padding: .3rem; border-radius: .6rem;
+  color: var(--brand); background: var(--brand-soft);
+  transition: background .18s ease, color .18s ease;
+}
+.nav-link[aria-current=page] {
+  background: linear-gradient(90deg, var(--brand-soft), transparent);
+}
+.nav-link[aria-current=page] > svg {
+  color: #fff;
+  background: linear-gradient(160deg, var(--verre-bleu-1), var(--verre-bleu-2));
+  box-shadow: var(--verre-ombre), inset 0 1px 0 rgb(255 255 255 / .5);
+}
+
+/* --- En-tête du site : verre dépoli au défilement -------------------- */
+header.sticky, body > header {
+  background-color: color-mix(in srgb, var(--surface) 78%, transparent);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .todo-card, .quick-action, .fo-carte .fo-fleche { transition: none; }
+  a.todo-card:hover, .quick-action:hover, .fo-carte:hover .fo-fleche { transform: none; }
+}
+@media print {
+  body { background-image: none; }
+  .fo-verre, .quick-action > svg { box-shadow: none; }
+}

@@ -20,6 +20,7 @@ $flashes   = array_filter(['success' => session('success'), 'error' => session('
     <title><?= esc($title) ?> · <?= esc($appName) ?></title>
     <link rel="preload" href="<?= base_url('assets/fonts/carlito-latin-400-normal.woff2') ?>" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="<?= base_url('assets/app.css?v=' . FO_ASSET_VERSION) ?>">
+    <link rel="stylesheet" href="<?= base_url('modules/forceos/verre.css?v=' . FO_ASSET_VERSION) ?>">
     <link rel="icon" href="<?= base_url('assets/icon.svg') ?>" type="image/svg+xml">
     <link rel="manifest" href="<?= site_url('manifest.webmanifest') ?>">
     <link rel="apple-touch-icon" href="<?= base_url('assets/icons/fostellantis.png') ?>">
