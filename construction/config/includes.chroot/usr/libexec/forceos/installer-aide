@@ -1,0 +1,14 @@
+#!/bin/sh
+# ForceOS : explication de l'installation depuis la session autonome
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+if zenity --question --width=520 --title="Installer ForceOS" \
+  --ok-label="Redémarrer maintenant" --cancel-label="Plus tard" \
+  --text="<b>L'installation se lance au démarrage de la clé USB.</b>
+
+1. Cliquez sur « Redémarrer maintenant » en laissant la clé branchée.
+2. Au menu de démarrage, descendez avec les flèches sur la ligne d’installation (<b>Start installer</b>, <b>Graphical install</b> ou <b>Install</b> selon l’écran), puis appuyez sur Entrée.
+3. Répondez aux questions : disque, phrase de chiffrement, mot de passe administrateur, compte du militant.
+
+Tout le contenu du disque choisi sera effacé."; then
+  systemctl reboot
+fi

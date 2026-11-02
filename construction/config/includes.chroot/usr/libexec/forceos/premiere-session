@@ -21,14 +21,22 @@ BUREAU=$(xdg-user-dir DESKTOP)
 mkdir -p "$BUREAU"
 # Lanceurs ForceOS copiés dans le vrai dossier du bureau, quel que soit son nom
 cp -n /etc/skel/Bureau/forceos-*.desktop "$BUREAU/" 2>/dev/null
-# Session autonome (clé USB) : icône d'installation sur le bureau. Absente une
-# fois le système installé, car le noyau n'est alors plus lancé avec boot=live.
+# Session autonome (clé USB) : icône « Installer ForceOS » sur le bureau. Elle
+# explique comment lancer l'installation depuis le menu de démarrage : lancé
+# depuis le bureau, l'installateur Debian refuse de fonctionner dès que le noyau
+# de la session (mis à jour par les correctifs de sécurité) diffère du sien.
+# Absente une fois le système installé (le noyau n'est plus lancé avec boot=live).
 if grep -qw 'boot=live' /proc/cmdline; then
-  for lanceur in /usr/share/applications/debian-installer-launcher*.desktop; do
-    [[ -f $lanceur ]] || continue
-    sed -e 's/^Name=.*/Name=Installer ForceOS/' -e '/^Name\[/d' "$lanceur" > "$BUREAU/forceos-installer.desktop"
-    break
-  done
+  cat > "$BUREAU/forceos-installer.desktop" <<'LANCEUR'
+[Desktop Entry]
+Type=Application
+Name=Installer ForceOS
+Comment=Installer ForceOS sur le disque de cet ordinateur
+Exec=/usr/libexec/forceos/installer-aide
+Icon=forceos-usb
+Terminal=false
+LANCEUR
+  chmod +x "$BUREAU/forceos-installer.desktop"
 fi
 for f in "$BUREAU"/forceos-*.desktop; do
   [[ -f $f ]] || continue
