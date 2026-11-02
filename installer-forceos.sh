@@ -127,7 +127,7 @@ while read -r p; do
   if apt-cache show "$p" >/dev/null 2>&1; then LISTE+=("$p"); else info "paquet indisponible, ignoré : $p"; fi
 done < <(grep -hvE '^\s*(#|$)' "$CONSTR"/config/package-lists/*.list.chroot | sort -u)
 apt-get install -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold \
-  "${LISTE[@]}" curl zstd cmake build-essential git ca-certificates python3-libsass
+  "${LISTE[@]}" curl zstd cmake build-essential git ca-certificates sassc
 
 # --- 2. Fichiers ForceOS ---------------------------------------------------------------
 bleu "2/8 Fichiers ForceOS"

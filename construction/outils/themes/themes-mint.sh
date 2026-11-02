@@ -8,7 +8,7 @@
 # utilisées et le thème Cinnamon « ForceOS » (barre du bas en bleu FO).
 #
 #   themes-mint.sh <dossier de cache> <racine cible>     (racine : / ou includes.chroot)
-# Prérequis : git, python3, pysassc (paquet python3-libsass).
+# Prérequis : git, python3, sassc (ou pysassc).
 # =====================================================================
 set -euo pipefail
 ICI=$(cd "$(dirname "$0")" && pwd)
@@ -16,11 +16,12 @@ ICI=$(cd "$(dirname "$0")" && pwd)
 . "$ICI/../../versions.conf"
 CACHE=${1:?dossier de cache}; CIBLE=${2:?racine cible}
 SRC=$CACHE/mint-themes
-# pysassc : commande du paquet python3-libsass, ou à défaut son module Python
+# Compilateur Sass : le script de Mint appelle « pysassc ». Sous Debian, la
+# commande équivalente est « sassc » (même bibliothèque libsass, mêmes arguments).
 if ! command -v pysassc >/dev/null; then
-  python3 -c 'import pysassc' 2>/dev/null || { echo "pysassc absent (paquet python3-libsass)" >&2; exit 1; }
+  command -v sassc >/dev/null || { echo "compilateur Sass absent (paquet sassc)" >&2; exit 1; }
   ENVELOPPE=$(mktemp -d)
-  printf '#!/bin/sh\nexec python3 -m pysassc "$@"\n' > "$ENVELOPPE/pysassc"; chmod +x "$ENVELOPPE/pysassc"
+  printf '#!/bin/sh\nexec sassc "$@"\n' > "$ENVELOPPE/pysassc"; chmod +x "$ENVELOPPE/pysassc"
   PATH=$ENVELOPPE:$PATH
 fi
 [[ -d $SRC/.git ]] || git clone --quiet https://github.com/linuxmint/mint-themes "$SRC"
