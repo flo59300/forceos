@@ -16,7 +16,7 @@
 const {
   app, BrowserWindow, session, dialog, ipcMain, shell, safeStorage, Menu
 } = require('electron');
-const { spawn } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -110,6 +110,26 @@ function verifierUtilisateurAutorise() {
 }
 
 /** Clé maîtresse : générée au premier lancement, protégée par le trousseau. */
+/**
+ * Trousseau GNOME prêt à l'emploi. Sous XFCE, le service peut ne pas être
+ * enregistré sur le bus de la session : on le démarre (sans effet s'il tourne
+ * déjà), puis on laisse à Chromium le temps d'initialiser son stockage chiffré.
+ */
+async function attendreTrousseau(delaiMs = 8000) {
+  try {
+    spawnSync('/usr/bin/gnome-keyring-daemon', ['--start', '--components=secrets'], { timeout: 5000, stdio: 'ignore' });
+  } catch { /* absent : le contrôle ci-dessous le signalera */ }
+  const fin = Date.now() + delaiMs;
+  while (Date.now() < fin) {
+    const pret = typeof safeStorage.isAsyncEncryptionAvailable === 'function'
+      ? await safeStorage.isAsyncEncryptionAvailable().catch(() => false)
+      : safeStorage.isEncryptionAvailable();
+    if (pret) return true;
+    await new Promise((r) => setTimeout(r, 400));
+  }
+  return false;
+}
+
 function chargerCleMaitresse(dossier) {
   if (!safeStorage.isEncryptionAvailable()) throw new Error('Le trousseau sécurisé du système est indisponible.');
   const backend = safeStorage.getSelectedStorageBackend?.() ?? 'gnome_libsecret';
@@ -440,6 +460,9 @@ async function demarrer() {
 
   // 2. Clé maîtresse
   let cle;
+  if (!(await attendreTrousseau())) {
+    return erreurFatale('trousseau sécurisé', 'Le trousseau sécurisé du système est indisponible.\nFermez la session, rouvrez-la, puis relancez FO Gestion.');
+  }
   try { cle = chargerCleMaitresse(donnees); } catch (e) { return erreurFatale('trousseau sécurisé', e.message); }
 
   // 3. PHP, extensions, MariaDB

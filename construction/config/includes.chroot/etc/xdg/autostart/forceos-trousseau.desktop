@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Trousseau sécurisé ForceOS
+Comment=Démarre le trousseau GNOME, qui protège la clé de FO Gestion (Florian Bigotte)
+Exec=/usr/bin/gnome-keyring-daemon --start --components=secrets
+NoDisplay=true
+X-GNOME-Autostart-Phase=PreDisplayServer
+X-XFCE-Autostart-Override=true
