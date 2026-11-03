@@ -374,6 +374,18 @@ ipcMain.handle('forceos:infos', async (evt) => {
 
 const MOTIF_TICKET = /^[a-f0-9]{64}$/;
 
+/**
+ * Date de la dernière sauvegarde réussie, lue par le rappel hebdomadaire de
+ * ForceOS (forceos-rappel-sauvegarde) et par « À propos de ForceOS ».
+ */
+function noterDerniereSauvegarde() {
+  try {
+    const dossier = path.join(app.getPath('home'), '.config', 'forceos');
+    fs.mkdirSync(dossier, { recursive: true });
+    fs.writeFileSync(path.join(dossier, 'derniere-sauvegarde'), `${new Date().toISOString()}\n`, { mode: 0o600 });
+  } catch { /* le rappel se manifestera simplement plus tôt */ }
+}
+
 ipcMain.handle('sauvegarde:exporter', async (evt, demande) => {
   if (!emetteurLegitime(evt)) throw new Error('Émetteur refusé.');
   const { ticket, phrase } = demande ?? {};
@@ -388,6 +400,7 @@ ipcMain.handle('sauvegarde:exporter', async (evt, demande) => {
   if (canceled || !filePath) return { annule: true };
   const destination = filePath.endsWith('.sql.enc') ? filePath : filePath.replace(/(\.sql)?(\.enc)?$/, '.sql.enc');
   const r = await exporterSauvegarde({ moteur, jeton: jetonPhp, jetonInterne, ticket, phrase, destination });
+  noterDerniereSauvegarde();
   return { ok: true, fichier: destination, taille: r.taille, empreinte: r.empreinte };
 });
 

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : analyse antivirus automatique des clés et disques USB
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Lancé avec la session. À chaque clé ouverte dans /media/<militant>, la
+# clé est analysée par ClamAV, en arrière-plan et à faible priorité. Rien
+# n'est supprimé : en cas de fichier suspect, le militant est prévenu et
+# peut ouvrir l'antivirus pour décider.
+# =====================================================================
+set -u
+MEDIA=/media/$USER
+command -v clamscan >/dev/null || exit 0
+
+analyser() {
+  local cible=$1 nom resultat code liste
+  nom=$(basename "$cible")
+  notify-send -a ForceOS -i security-high "Analyse de la clé « $nom »" "Recherche de virus en cours. Vous pouvez continuer à travailler." 2>/dev/null
+  resultat=$(nice -n 10 ionice -c 3 clamscan -r -i --no-summary --max-filesize=200M --max-scansize=500M -- "$cible" 2>/dev/null)
+  code=$?
+  case $code in
+    0) notify-send -a ForceOS -i security-high "Clé « $nom » saine" "Aucun virus trouvé." 2>/dev/null ;;
+    1)
+      liste=$(printf '%s\n' "$resultat" | sed -n 's/: .* FOUND$//p' | sed "s|^$cible/||" | head -15)
+      if zenity --question --width=520 --title="Fichier suspect sur la clé « $nom »" \
+           --ok-label="Ouvrir l'antivirus" --cancel-label="Fermer" \
+           --text="<b>L'antivirus a trouvé des fichiers dangereux sur cette clé.</b>\n\nNe les ouvrez pas :\n\n$(printf '%s\n' "$liste" | sed 's/[&<>]/_/g')\n\nPrévenez Florian Bigotte." 2>/dev/null; then
+        clamtk "$cible" >/dev/null 2>&1 &
+      fi ;;
+    *) notify-send -a ForceOS -i dialog-warning "Clé « $nom » non analysée" "La base antivirale n'est pas disponible. Analyse possible au clic droit plus tard." 2>/dev/null ;;
+  esac
+}
+
+# Événements de montage du système ; seuls les supports du militant sont analysés
+findmnt --poll=mount -n -r -o ACTION,TARGET 2>/dev/null | while read -r action cible; do
+  [[ $action == mount ]] || continue
+  cible=$(printf '%b' "$cible")          # « \x20 » de la sortie brute : espaces
+  [[ $cible == "$MEDIA"/* && -d $cible ]] || continue
+  analyser "$cible" &
+done

@@ -52,7 +52,7 @@ if ! grep -q '^SERVEUR=..' "$INC/etc/forceos/support.conf" 2>/dev/null; then
 fi
 apt-get update >/dev/null
 apt-get install -y --no-install-recommends live-build file cpio curl zstd cmake build-essential git ca-certificates \
-  nftables libxml2-utils gnupg xz-utils python3 sassc >/dev/null
+  nftables libxml2-utils gnupg xz-utils python3 sassc python3-pil fonts-crosextra-carlito >/dev/null
 
 # --- 1. Paquet FO Gestion -----------------------------------------------------------
 etape "Paquet FO Gestion"
@@ -63,6 +63,13 @@ printf '%s\n' "$FORCEOS_VERSION" > "$INC/etc/forceos/version"
 # avec certitude quelle image a servi à l'installation
 CONSTRUCTION=$(TZ=Europe/Paris date '+%Y%m%d-%H%M')
 printf 'ForceOS %s, image construite le %s\n' "$FORCEOS_VERSION" "$(TZ=Europe/Paris date '+%d/%m/%Y à %H:%M')" > "$INC/etc/forceos/construction"
+# Écran de connexion : fond d'écran portant la version et la date de l'image
+python3 "$RACINE/outils/connexion/fond-connexion.py" \
+  "$INC/usr/share/backgrounds/forceos/forceos-fond-1920x1080.png" \
+  "$INC/usr/share/backgrounds/forceos/forceos-connexion.png" \
+  "ForceOS $FORCEOS_VERSION  ·  image du $(TZ=Europe/Paris date '+%d/%m/%Y à %H:%M')" \
+  /usr/share/fonts/truetype/crosextra/Carlito-Regular.ttf \
+  || erreur "fond de l'écran de connexion non produit."
 
 # --- 2. RustDesk -------------------------------------------------------------------
 etape "RustDesk $RUSTDESK_VERSION"

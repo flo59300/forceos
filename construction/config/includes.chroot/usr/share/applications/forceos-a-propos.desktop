@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=À propos de ForceOS
+Comment=Version de l'image, de FO Gestion, dernière sauvegarde et antivirus
+Exec=forceos-a-propos
+Icon=forceos-apropos
+Terminal=false
+Categories=System;

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=ForceOS : rappel de sauvegarde
+Exec=/usr/bin/forceos-rappel-sauvegarde
+OnlyShowIn=X-Cinnamon;
+NoDisplay=true

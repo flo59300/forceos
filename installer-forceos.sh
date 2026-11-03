@@ -126,13 +126,18 @@ while read -r p; do
   if apt-cache show "$p" >/dev/null 2>&1; then LISTE+=("$p"); else info "paquet indisponible, ignoré : $p"; fi
 done < <(grep -hvE '^\s*(#|$)' "$CONSTR"/config/package-lists/*.list.chroot | sort -u)
 apt-get install -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold \
-  "${LISTE[@]}" curl zstd cmake build-essential git ca-certificates sassc
+  "${LISTE[@]}" curl zstd cmake build-essential git ca-certificates sassc python3-pil
 
 # --- 2. Fichiers ForceOS ---------------------------------------------------------------
 bleu "2/8 Fichiers ForceOS"
 cp -r --preserve=mode,timestamps "$INC"/. /
 chown -R root:root /etc/forceos /usr/libexec/forceos /usr/share/forceos
 printf '%s\n' "$FORCEOS_VERSION" > /etc/forceos/version
+printf 'ForceOS %s, installé le %s\n' "$FORCEOS_VERSION" "$(date '+%d/%m/%Y à %H:%M')" > /etc/forceos/construction
+python3 "$CONSTR/outils/connexion/fond-connexion.py" \
+  /usr/share/backgrounds/forceos/forceos-fond-1920x1080.png /usr/share/backgrounds/forceos/forceos-connexion.png \
+  "ForceOS $FORCEOS_VERSION  ·  installé le $(date '+%d/%m/%Y')" /usr/share/fonts/truetype/crosextra/Carlito-Regular.ttf \
+  || cp /usr/share/backgrounds/forceos/forceos-fond-1920x1080.png /usr/share/backgrounds/forceos/forceos-connexion.png
 
 # --- 3. Transcription audio (whisper.cpp) ------------------------------------------------
 bleu "3/8 Transcription audio"

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=ForceOS : analyse des clés USB
+Exec=/usr/bin/forceos-analyse-usb
+OnlyShowIn=X-Cinnamon;
+NoDisplay=true

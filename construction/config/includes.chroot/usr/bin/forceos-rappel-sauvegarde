@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : rappel de sauvegarde de FO Gestion
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Lancé avec la session du militant autorisé. Si la dernière sauvegarde
+# chiffrée date de plus de 7 jours (ou n'a jamais été faite), une fenêtre
+# le rappelle et propose d'ouvrir FO Gestion. Question reposée chaque jour
+# tant que la sauvegarde n'est pas faite.
+# =====================================================================
+set -u
+AUTORISE=$(cat /etc/forceos/utilisateur-autorise 2>/dev/null)
+[[ $AUTORISE == "$USER" ]] || exit 0
+REPERE=$HOME/.config/forceos/derniere-sauvegarde
+DELAI=7
+
+sleep 180   # laisser le temps d'ouvrir la session tranquillement
+while true; do
+  # FO Gestion configurée sur ce poste (clé de chiffrement créée) ?
+  if [[ -f $HOME/.config/ForceOS/cle-maitresse.enc ]]; then
+    jours=-1
+    if [[ -s $REPERE ]] && derniere=$(date -d "$(head -1 "$REPERE")" +%s 2>/dev/null); then
+      jours=$(( ($(date +%s) - derniere) / 86400 ))
+    fi
+    if (( jours < 0 || jours >= DELAI )); then
+      if (( jours < 0 )); then
+        texte="Aucune sauvegarde chiffrée de FO Gestion n'a encore été faite sur ce poste."
+      else
+        texte="La dernière sauvegarde chiffrée de FO Gestion date de $jours jours."
+      fi
+      if zenity --question --width=480 --title="Sauvegarde de FO Gestion" \
+           --ok-label="Ouvrir FO Gestion" --cancel-label="Plus tard" \
+           --text="<b>$texte</b>\n\nSi ce poste tombe en panne ou est perdu, les données de la section sont perdues avec lui.\n\nBranchez une clé USB, ouvrez FO Gestion, puis « Tout le reste » et « Sauvegarde chiffrée »." 2>/dev/null; then
+        "/opt/FO Gestion/forceos-fo-gestion" >/dev/null 2>&1 &
+      fi
+    fi
+  fi
+  sleep 86400
+done

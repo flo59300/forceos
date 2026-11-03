@@ -70,6 +70,10 @@ GLYPHES = {
     "courriel": ('indigo', '''
         <rect x="3" y="5.5" width="18" height="13" rx="2.5"/>
         <path d="m3.8 7 8.2 6 8.2-6"/>'''),
+    "apropos": ('nuit', '''
+        <circle cx="12" cy="12" r="8.5"/>
+        <path d="M12 11v5.5"/>
+        <path d="M12 7.6v.01"/>'''),
     "documents": ('bleu', '''
         <path d="M3.5 7a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>
         <path d="M3.5 10h17"/>'''),

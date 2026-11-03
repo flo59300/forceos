@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : fenêtre « À propos de ForceOS »
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# Version de l'image, de FO Gestion et de Debian, dernière sauvegarde,
+# base antivirale, mémoire et espace disque.
+# =====================================================================
+set -u
+construction=$(cat /etc/forceos/construction 2>/dev/null || echo "ForceOS $(cat /etc/forceos/version 2>/dev/null || echo '?')")
+fogestion=$(dpkg-query -W -f '${Version}' forceos-fo-gestion 2>/dev/null || echo "non installée")
+debian=$(cat /etc/debian_version 2>/dev/null || echo "?")
+repere=$HOME/.config/forceos/derniere-sauvegarde
+if [[ -s $repere ]] && d=$(date -d "$(head -1 "$repere")" '+%d/%m/%Y à %H:%M' 2>/dev/null); then
+  sauvegarde=$d
+else
+  sauvegarde="jamais faite sur ce poste"
+fi
+base=$(ls -t /var/lib/clamav/daily.c[lv]d 2>/dev/null | head -1)
+antivirus=$([[ -n $base ]] && date -r "$base" '+%d/%m/%Y' || echo "non disponible")
+memoire=$(awk '/MemTotal/ {printf "%.1f Go", $2/1048576}' /proc/meminfo)
+disque=$(df -h --output=avail "$HOME" | tail -1 | tr -d ' ')
+zenity --info --width=460 --title="À propos de ForceOS" --icon-name=forceos-apropos \
+  --text="<b><big>$construction</big></b>
+
+FO Gestion : version $fogestion
+Debian : $debian
+Dernière sauvegarde de FO Gestion : $sauvegarde
+Base antivirale du : $antivirus
+Mémoire : $memoire, espace libre : $disque
+
+Conçu et développé par Florian Bigotte pour Force Ouvrière.
+Assistance : icône « Contacter le support » du bureau." 2>/dev/null
