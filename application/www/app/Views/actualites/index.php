@@ -5,7 +5,7 @@ $errors = session('errors') ?? [];
 $active = array_values(array_filter($feeds, static fn ($f) => (int) $f['active'] === 1));
 ?>
 <h1 class="text-3xl">Fil d’actualité</h1>
-<p class="mt-1 text-lg text-muted">Les dernières publications des sites suivis par la section.</p>
+<p class="mt-1 text-lg text-muted">Les dernières publications des sites suivis par le syndicat.</p>
 
 <?php if ($canManage): ?>
 <nav class="tabs mt-5 max-w-md" aria-label="Rubriques du fil d’actualité">
@@ -16,7 +16,7 @@ $active = array_values(array_filter($feeds, static fn ($f) => (int) $f['active']
 
 <?php if ($tab === 'articles'): ?>
     <?php if (! $active): ?>
-    <div class="card mt-6"><p class="m-0"><?= $canManage ? 'Aucun flux n’est suivi. Ajoutez-en un dans l’onglet « Flux suivis ».' : 'Aucun flux n’est encore suivi par la section.' ?></p></div>
+    <div class="card mt-6"><p class="m-0"><?= $canManage ? 'Aucun flux n’est suivi. Ajoutez-en un dans l’onglet « Flux suivis ».' : 'Aucun flux n’est encore suivi par le syndicat.' ?></p></div>
     <?php else: ?>
         <?php if (count($active) > 1): ?>
         <nav class="mt-6 flex flex-wrap gap-2" aria-label="Filtrer par source">

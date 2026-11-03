@@ -197,6 +197,43 @@ $routes->group('forceos', ['filter' => ['auth', 'role:secretaire,tresorier']], s
               "    <link rel=\"stylesheet\" href=\"<?= base_url('assets/app.css?v=' . FO_ASSET_VERSION) ?>\">\n"
               "    <link rel=\"stylesheet\" href=\"<?= base_url('modules/forceos/verre.css?v=' . FO_ASSET_VERSION) ?>\">\n")
 
+    # 10. Vocabulaire : « syndicat FO » plutôt que « section syndicale »
+    vocabulaire = {
+        "app/Views/guide/legal.php": [
+            ("de la section syndicale Force Ouvrière.", "du syndicat FO."),
+            ("aux intérêts de la section", "aux intérêts du syndicat FO"),
+            ("La section ne garantit pas", "Le syndicat FO ne garantit pas"),
+            ("Force Ouvrière, section syndicale Stellantis.", "Syndicat FO Stellantis."),
+            ("le secrétaire de section.", "le secrétaire du syndicat."),
+            ("responsable technique de la section", "responsable technique du syndicat"),
+            ("coordonnées internes de la section FO", "coordonnées internes du syndicat FO"),
+            ("la propriété de la section syndicale Force Ouvrière", "la propriété du syndicat FO"),
+            ("La section syndicale Force Ouvrière de Stellantis est responsable", "Le syndicat FO de Stellantis est responsable"),
+            ("responsables habilités de la section", "responsables habilités du syndicat"),
+        ],
+        "app/Views/actualites/index.php": [
+            ("suivis par la section.", "suivis par le syndicat."),
+            ("suivi par la section.", "suivi par le syndicat."),
+        ],
+        "app/Views/platform/settings.php": [("Conditions propres à la section", "Conditions propres au syndicat")],
+        "app/Views/agenda/form.php": [("Réunion de section", "Réunion du syndicat")],
+    }
+    for relatif, paires in vocabulaire.items():
+        f = www / relatif
+        texte = f.read_text(encoding="utf-8")
+        for ancien, nouveau in paires:
+            if ancien not in texte:
+                sys.exit(f"ARRÊT : « {ancien} » introuvable dans {f}")
+            texte = texte.replace(ancien, nouveau)
+        f.write_text(texte, encoding="utf-8")
+    # « secrétaire de section » partout dans les écrans
+    for f in (www / "app/Views").rglob("*.php"):
+        texte = f.read_text(encoding="utf-8")
+        nouveau = (texte.replace("secrétaires de section", "secrétaires du syndicat")
+                        .replace("secrétaire de section", "secrétaire du syndicat"))
+        if nouveau != texte:
+            f.write_text(nouveau, encoding="utf-8")
+
     print(f"FO Gestion intégrée dans {www}")
 
 

@@ -18,7 +18,7 @@ $opSr  = $form['op'] === '+' ? 'plus' : 'multiplié par';
     <h2 id="t-ok" class="section-title">Demande enregistrée</h2>
     <p>Votre demande pour le <strong><?= esc(date_fr($p['perm_date'], 'EEEE d MMMM')) ?></strong> a bien été reçue. La suite :</p>
     <ol class="m-0 grid gap-2 pl-6">
-        <li>le secrétaire de section valide votre demande ;</li>
+        <li>le secrétaire du syndicat valide votre demande ;</li>
         <li>vous recevez un courriel avec un lien ;</li>
         <li>vous ouvrez ce lien et confirmez votre inscription.</li>
     </ol>

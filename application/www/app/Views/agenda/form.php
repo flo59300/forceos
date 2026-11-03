@@ -23,7 +23,7 @@ $action = $e ? site_url('agenda/' . $e['id']) : site_url('agenda');
         <?= csrf_field() ?>
         <div class="field">
             <label class="label" for="title">Titre <span class="font-normal text-muted">(obligatoire)</span></label>
-            <input class="input" type="text" maxlength="255" required autocomplete="off" placeholder="Réunion de section"<?= field_attrs('title', $errors) ?> value="<?= esc($v('title'), 'attr') ?>">
+            <input class="input" type="text" maxlength="255" required autocomplete="off" placeholder="Réunion du syndicat"<?= field_attrs('title', $errors) ?> value="<?= esc($v('title'), 'attr') ?>">
             <?= field_error('title', $errors) ?>
         </div>
         <div class="grid gap-x-4 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))]">

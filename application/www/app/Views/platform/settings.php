@@ -107,7 +107,7 @@ $img = static fn (string $p) => is_file(FCPATH . ltrim($p, '/')) ? base_url(ltri
     <p class="mt-0">Compléments affichés en tête des pages <a href="<?= site_url('mentions-legales') ?>">Mentions légales</a> et <a href="<?= site_url('cgu') ?>">Conditions d’utilisation</a>. Texte simple ; la mise en forme HTML de base (paragraphes, gras, listes, liens) est acceptée.</p>
     <form method="post" action="<?= site_url('plateforme/reglages/legal') ?>" novalidate>
         <?= csrf_field() ?>
-        <?php foreach (['legal_mentions' => ['Mentions légales', 'Éditeur, hébergeur, responsable de publication…'], 'legal_rgpd' => ['Politique RGPD (sous les mentions légales)', 'Responsable de traitement, données collectées, durée de conservation…'], 'legal_cgu' => ['Conditions propres à la section', '']] as $k => [$l, $ph]): ?>
+        <?php foreach (['legal_mentions' => ['Mentions légales', 'Éditeur, hébergeur, responsable de publication…'], 'legal_rgpd' => ['Politique RGPD (sous les mentions légales)', 'Responsable de traitement, données collectées, durée de conservation…'], 'legal_cgu' => ['Conditions propres au syndicat', '']] as $k => [$l, $ph]): ?>
         <div class="field"><label class="label" for="<?= $k ?>"><?= esc($l) ?></label><textarea class="input min-h-32" id="<?= $k ?>" name="<?= $k ?>" maxlength="20000" placeholder="<?= esc($ph, 'attr') ?>"><?= esc($val($k)) ?></textarea></div>
         <?php endforeach ?>
         <button class="btn btn-primary">Enregistrer</button>

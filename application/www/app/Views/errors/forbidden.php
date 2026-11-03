@@ -1,1 +1,1 @@
-<?= view('errors/_page', ['code' => 403, 'title' => 'Accès refusé', 'message' => 'Votre rôle ne donne pas accès à cet écran. Si vous pensez que c’est une erreur, adressez-vous à votre secrétaire de section.']) ?>
+<?= view('errors/_page', ['code' => 403, 'title' => 'Accès refusé', 'message' => 'Votre rôle ne donne pas accès à cet écran. Si vous pensez que c’est une erreur, adressez-vous à votre secrétaire du syndicat.']) ?>

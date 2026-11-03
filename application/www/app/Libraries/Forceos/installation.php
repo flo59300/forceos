@@ -110,7 +110,7 @@ function forceos_premiere_configuration(PDO $pdo, array $d): array
 
     $erreurs = [];
     if (mb_strlen($section) < 2 || mb_strlen($section) > 255) {
-        $erreurs[] = 'Le nom de la section doit comporter entre 2 et 255 caractères.';
+        $erreurs[] = 'Le nom du syndicat doit comporter entre 2 et 255 caractères.';
     }
     if ($prenom === '' || mb_strlen($prenom) > 100 || $nom === '' || mb_strlen($nom) > 100) {
         $erreurs[] = 'Le prénom et le nom sont obligatoires (100 caractères au maximum).';

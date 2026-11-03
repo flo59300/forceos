@@ -34,7 +34,7 @@
     </form>
     <?php if (session('error')): ?><p id="login-err" class="sr-only"><?= esc(session('error')) ?></p><?php endif ?>
 </div>
-<p class="mt-6 text-center text-muted">Mot de passe oublié : adressez-vous à votre secrétaire de section.</p>
+<p class="mt-6 text-center text-muted">Mot de passe oublié : adressez-vous à votre secrétaire du syndicat.</p>
 <p class="mt-2 text-center text-sm"><a href="<?= site_url('mentions-legales') ?>">Mentions légales</a> · <a href="<?= site_url('cgu') ?>">Conditions d’utilisation</a> · <a href="<?= site_url('confidentialite') ?>">Confidentialité</a></p>
 <script src="<?= base_url('assets/js/alpine.min.js?v=' . FO_ASSET_VERSION) ?>" defer></script>
 <script>

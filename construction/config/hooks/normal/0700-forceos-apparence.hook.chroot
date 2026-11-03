@@ -45,6 +45,11 @@ for id in libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-dr
 done
 echo "Dossier Bureautique : $(ls /etc/skel/Bureau/Bureautique | tr '\n' ' ')"
 
+# --- Démarrage : plus de fond d'écran Debian 13 dans GRUB --------------------
+# Le thème de desktop-base (logo Debian) est désactivé ; le menu est caché
+# par /etc/default/grub.d/50-forceos.cfg.
+[ -f /etc/grub.d/05_debian_theme ] && chmod -x /etc/grub.d/05_debian_theme
+
 # --- Démarrage : thème Plymouth ForceOS (logo sur pastille blanche) ---------
 # La phrase de chiffrement du disque est saisie sur cet écran.
 if [ -d /usr/share/plymouth/themes/spinner ]; then
