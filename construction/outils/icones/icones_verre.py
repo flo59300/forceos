@@ -61,6 +61,15 @@ GLYPHES = {
         <path d="M9 9V3.5h6V9"/>
         <path d="M10.6 5.6h.01M13.4 5.6h.01"/>
         <path d="M12 12.5v4.5"/>'''),
+    "bureautique": ('bleu', '''
+        <path d="M5 3.5h8l4 4V13"/>
+        <path d="M13 3.5v4h4"/>
+        <path d="M5 3.5v17h6"/>
+        <path d="M8 10h5M8 13.5h3"/>
+        <path d="m14.5 20.5 5.6-5.6a1.5 1.5 0 0 0-2.1-2.1l-5.6 5.6-.6 2.7z"/>'''),
+    "courriel": ('indigo', '''
+        <rect x="3" y="5.5" width="18" height="13" rx="2.5"/>
+        <path d="m3.8 7 8.2 6 8.2-6"/>'''),
     "documents": ('bleu', '''
         <path d="M3.5 7a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>
         <path d="M3.5 10h17"/>'''),

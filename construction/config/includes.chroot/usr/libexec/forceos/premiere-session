@@ -46,6 +46,26 @@ for f in "$BUREAU"/forceos-*.desktop; do
   gio set -t string "$f" metadata::trusted true 2>/dev/null
 done
 
+# --- Dossier « Bureautique » : toute la suite bureautique au même endroit ------
+# Lanceurs copiés depuis les applications installées (noms et icônes en
+# français) ; une application absente est simplement ignorée.
+BUREAUTIQUE=$BUREAU/Bureautique
+mkdir -p "$BUREAUTIQUE"
+for id in libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-draw \
+          scribus org.gnome.Evince com.github.johnfactotum.Foliate \
+          com.github.jeromerobert.pdfarranger pdfarranger \
+          simple-scan org.gnome.SimpleScan org.gnome.Calculator \
+          thunderbird org.mozilla.Thunderbird; do
+  src=/usr/share/applications/$id.desktop
+  [[ -f $src && ! -e $BUREAUTIQUE/$id.desktop ]] || continue
+  cp "$src" "$BUREAUTIQUE/"
+  chmod u+x "$BUREAUTIQUE/$id.desktop"
+  gio set -t string "$BUREAUTIQUE/$id.desktop" metadata::trusted true 2>/dev/null
+done
+# Icône « verre » du dossier
+gio set -t string "$BUREAUTIQUE" metadata::custom-icon \
+  "file:///usr/share/icons/hicolor/256x256/apps/forceos-bureautique.png" 2>/dev/null
+
 # --- Trousseau sécurisé -------------------------------------------------------
 # Sans lui, FO Gestion ne peut pas protéger sa clé de chiffrement.
 if ! busctl --user status org.freedesktop.secrets >/dev/null 2>&1; then

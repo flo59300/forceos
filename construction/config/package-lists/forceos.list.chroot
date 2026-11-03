@@ -78,6 +78,10 @@ ffmpeg
 vlc
 simple-scan
 
+# --- Courriel (en option sur le bureau, dossier Bureautique) ---
+thunderbird
+thunderbird-l10n-fr
+
 # --- Impression ---
 cups
 cups-browsed
