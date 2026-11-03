@@ -14,7 +14,7 @@
  *      synchronisation des documents de l'IA
  */
 const {
-  app, BrowserWindow, session, dialog, ipcMain, shell, safeStorage, Menu
+  app, BrowserWindow, session, dialog, ipcMain, shell, safeStorage, Menu, powerMonitor
 } = require('electron');
 const { spawn, spawnSync } = require('node:child_process');
 const crypto = require('node:crypto');
@@ -443,6 +443,42 @@ ipcMain.handle('sauvegarde:restaurer', async (evt, demande) => {
 // ---------------------------------------------------------------------
 // Fenêtre principale
 // ---------------------------------------------------------------------
+/**
+ * Poste partagé : chaque militant a son compte FO Gestion. Dès que l'écran
+ * se verrouille (veille de Cinnamon, Super+L, bouton d'urgence) ou que le PC
+ * se met en veille, la connexion FO Gestion est fermée : la personne
+ * suivante doit se reconnecter avec son propre compte.
+ */
+function deconnecterSession() {
+  cookies.vider();
+  if (fenetre && !fenetre.isDestroyed() && origine) fenetre.loadURL(`${origine}/connexion`).catch(() => {});
+}
+
+function surveillerVerrouillage() {
+  powerMonitor.on('lock-screen', deconnecterSession);
+  powerMonitor.on('suspend', deconnecterSession);
+  // Sous Linux, le verrouillage est signalé par l'économiseur d'écran sur le bus de session
+  const filtres = ['org.cinnamon.ScreenSaver', 'org.gnome.ScreenSaver', 'org.freedesktop.ScreenSaver']
+    .map((i) => `type='signal',interface='${i}',member='ActiveChanged'`);
+  let surveillance;
+  try {
+    surveillance = spawn('/usr/bin/dbus-monitor', ['--session', ...filtres], { stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch { return; }
+  surveillance.on('error', () => {});
+  let signal = false;
+  let reste = '';
+  surveillance.stdout.setEncoding('utf8');
+  surveillance.stdout.on('data', (morceau) => {
+    const lignes = (reste + morceau).split('\n');
+    reste = lignes.pop();
+    for (const l of lignes) {
+      if (l.startsWith('signal ')) signal = /member=ActiveChanged/.test(l);
+      else if (signal && /^\s*boolean true\b/.test(l)) { signal = false; deconnecterSession(); }
+    }
+  });
+  app.on('will-quit', () => { try { surveillance.kill(); } catch { /* déjà arrêté */ } });
+}
+
 function creerFenetre() {
   fenetre = new BrowserWindow({
     width: 1400,
@@ -522,6 +558,7 @@ async function demarrer() {
   // 7. Fenêtre principale
   verrouillerSession();
   creerFenetre();
+  surveillerVerrouillage();
   synchroniserDocuments();
 }
 
