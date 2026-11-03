@@ -74,3 +74,7 @@ fi
 
 mkdir -p "$(dirname "$MARQUEUR")"
 touch "$MARQUEUR"
+
+# --- Guide de démarrage, une seule fois, quand le bureau est prêt ------------
+sleep 8
+forceos-guide >/dev/null 2>&1 &

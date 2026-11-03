@@ -1,0 +1,125 @@
+#!/usr/bin/python3
+"""
+ForceOS : guide de démarrage
+Conçu et développé par Florian Bigotte pour Force Ouvrière
+
+Ouvert automatiquement à la première session, puis depuis le menu
+(« Guide de démarrage ForceOS »). Six pages courtes, une par usage.
+"""
+import sys
+
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk, GdkPixbuf, Gtk  # noqa: E402
+
+ICONES = "/usr/share/icons/hicolor/256x256/apps"
+LOGO = "/usr/share/icons/hicolor/128x128/apps/forceos.png"
+
+PAGES = [
+    ("Bienvenue", None, "Bienvenue sur ForceOS",
+     "ForceOS est le poste de travail des militants Force Ouvrière. Tout ce dont la section a "
+     "besoin est déjà installé, et les données restent sur ce PC, chiffrées.\n\n"
+     "Ce guide présente l'essentiel en cinq étapes. Vous pourrez le rouvrir à tout moment "
+     "depuis le menu, avec « Guide de démarrage ForceOS »."),
+    ("FO Gestion", "forceos-gestion", "FO Gestion, la gestion de la section",
+     "Double-cliquez sur l'icône « FO Gestion » du bureau. Elle fonctionne sans Internet : "
+     "adhérents, cotisations, heures de délégation, agenda, élections.\n\n"
+     "Au tout premier lancement, l'application vous demande le nom de la section et votre "
+     "compte. Les écrans moins fréquents sont dans « Tout le reste ».\n\n"
+     "L'assistant IA (accords, tracts, comptes rendus d'enregistrements) est dans FO Gestion, "
+     "rubrique « Connaissances ». Il travaille sur ce PC, rien ne part sur Internet."),
+    ("Documents", "forceos-bureautique", "Vos documents et les modèles FO",
+     "Le dossier « Bureautique » du bureau regroupe le traitement de texte, le tableur, les "
+     "présentations, Scribus, les lecteurs PDF et la messagerie.\n\n"
+     "Pour un courrier ou un compte rendu aux couleurs FO : dans un dossier, clic droit, "
+     "« Créer un nouveau document », puis choisissez le modèle (lettre à la direction, compte "
+     "rendu de CSE, signalement de danger grave et imminent, convocation, communiqué). "
+     "Complétez les passages en rouge.\n\n"
+     "Les textes de référence vont dans « Bibliothèque syndicale », et les documents que "
+     "l'assistant IA doit connaître dans « Documents de l'IA »."),
+    ("Sécurité", "forceos-verrouillage", "Protéger les données de la section",
+     "En cas de besoin, l'icône rouge « Verrouillage rapide » (ou Ctrl + Alt + Pause) verrouille "
+     "l'écran, ferme FO Gestion et les documents, et referme le coffre-fort, en quelques secondes.\n\n"
+     "Le « Coffre-fort FO » garde les documents les plus sensibles, protégés par sa propre phrase "
+     "de passe.\n\n"
+     "Chaque clé USB est analysée automatiquement par l'antivirus. N'ouvrez jamais un fichier "
+     "signalé comme dangereux.\n\n"
+     "Avant de projeter devant la direction, activez le « Mode présentation » : les "
+     "notifications sont coupées."),
+    ("Sauvegarde", "forceos-coffre", "Sauvegarder chaque semaine",
+     "Si le PC tombe en panne ou est perdu, les données de FO Gestion partent avec lui. "
+     "Branchez une clé USB, ouvrez FO Gestion, puis « Tout le reste » et « Sauvegarde chiffrée ».\n\n"
+     "Le fichier est chiffré par une phrase de passe : notez-la et gardez-la à part. Sans elle, "
+     "personne ne peut le lire, vous non plus.\n\n"
+     "ForceOS vous le rappelle si la dernière sauvegarde date de plus de sept jours."),
+    ("Aide", "forceos-support", "En cas de souci",
+     "L'icône « Contacter le support » permet à Florian Bigotte de voir votre écran pour vous "
+     "aider, seulement si vous l'autorisez, et le temps de l'intervention.\n\n"
+     "« À propos de ForceOS », dans le menu, indique la version du poste et la date de la "
+     "dernière sauvegarde : c'est utile à communiquer lors d'une demande d'aide.\n\n"
+     "Bonne utilisation, et ensemble, + FOrts !"),
+]
+
+CSS = b"""
+window, assistant { background-color: #F4F6FB; }
+.titre { color: #002B7F; font-family: Carlito; font-size: 22pt; font-weight: bold; }
+.texte { color: #1B2540; font-family: Carlito; font-size: 13pt; }
+.bandeau { background-color: #002B7F; }
+.filet { background-color: #E2001A; min-height: 4px; }
+assistant .sidebar { background-color: #002B7F; padding: 12px; }
+assistant .sidebar label { color: rgba(255,255,255,0.7); font-family: Carlito; font-size: 12pt; padding: 6px 10px; }
+assistant .sidebar label.highlight { color: #FFFFFF; font-weight: bold; background-color: rgba(255,255,255,0.15); border-radius: 6px; }
+"""
+
+
+def page(icone, titre, texte):
+    boite = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18, margin=36)
+    entete = Gtk.Box(spacing=20)
+    chemin = LOGO if icone is None else f"{ICONES}/{icone}.png"
+    try:
+        image = Gtk.Image.new_from_pixbuf(GdkPixbuf.Pixbuf.new_from_file_at_size(chemin, 88, 88))
+        entete.pack_start(image, False, False, 0)
+    except Exception:
+        pass
+    t = Gtk.Label(label=titre, xalign=0, wrap=True, width_chars=30)
+    t.get_style_context().add_class("titre")
+    entete.pack_start(t, True, True, 0)
+    boite.pack_start(entete, False, False, 0)
+    filet = Gtk.Box()
+    filet.get_style_context().add_class("filet")
+    boite.pack_start(filet, False, False, 0)
+    corps = Gtk.Label(label=texte, xalign=0, yalign=0, wrap=True, width_chars=62, max_width_chars=70)
+    corps.get_style_context().add_class("texte")
+    boite.pack_start(corps, True, True, 0)
+    return boite
+
+
+def main():
+    fournisseur = Gtk.CssProvider()
+    fournisseur.load_from_data(CSS)
+    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), fournisseur,
+                                             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    a = Gtk.Assistant(title="Guide de démarrage ForceOS", use_header_bar=False)
+    a.set_default_size(860, 560)
+    a.set_position(Gtk.WindowPosition.CENTER)
+    a.set_icon_name("forceos-apropos")
+    for i, (etape, icone, titre, texte) in enumerate(PAGES):
+        p = page(icone, titre, texte)
+        a.append_page(p)
+        a.set_page_title(p, etape)
+        a.set_page_type(p, Gtk.AssistantPageType.INTRO if i == 0 else
+                        Gtk.AssistantPageType.SUMMARY if i == len(PAGES) - 1 else
+                        Gtk.AssistantPageType.CONTENT)
+        a.set_page_complete(p, True)
+    a.connect("cancel", Gtk.main_quit)
+    a.connect("close", Gtk.main_quit)
+    a.connect("destroy", Gtk.main_quit)
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():      # page de départ (aide, essais)
+        a.set_current_page(min(int(sys.argv[1]), len(PAGES) - 1))
+    a.show_all()
+    Gtk.main()
+
+
+if __name__ == "__main__":
+    main()

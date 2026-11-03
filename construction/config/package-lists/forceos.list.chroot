@@ -36,6 +36,8 @@ gnome-screenshot
 gnome-system-monitor
 xdg-desktop-portal-gtk
 dconf-cli
+python3-gi
+gir1.2-gtk-3.0
 lightdm
 slick-greeter
 network-manager-gnome

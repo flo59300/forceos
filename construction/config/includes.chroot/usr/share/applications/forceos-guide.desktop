@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Guide de démarrage ForceOS
+Comment=L'essentiel de ForceOS en six pages : FO Gestion, documents, sécurité, sauvegarde, aide
+Exec=forceos-guide
+Icon=forceos-apropos
+Terminal=false
+Categories=System;
