@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : options du poste (root)
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+#   options-racine definir <option> <oui|non>   (via pkexec, « Réglages ForceOS »)
+#   options-racine appliquer                    (au démarrage, forceos-options.service)
+# =====================================================================
+set -uo pipefail
+FICHIER=/etc/forceos/options.conf
+OPTIONS=(filtrage_dns assistant_ia mode_serveur support_distance deconnexion_verrouillage menu_demarrage)
+DNS_OUVERT_V4=(9.9.9.9 149.112.112.112)   # Quad9 : résolveur sécurisé, sans filtrage des contenus
+
+valeur() { awk -F= -v k="$1" '$1 == k {v = $2} END {print (v == "" ? "oui" : v)}' "$FICHIER" 2>/dev/null; }
+
+appliquer() {
+  case $1 in
+    filtrage_dns)
+      if [[ $(valeur filtrage_dns) == non ]]; then
+        for a in "${DNS_OUVERT_V4[@]}"; do nft add element inet forceos dns_filtre_v4 "{ $a }" 2>/dev/null; done
+        printf '# ForceOS : filtrage désactivé dans « Réglages ForceOS » (Quad9)\nnameserver %s\nnameserver %s\noptions edns0 timeout:2 attempts:2\n' \
+          "${DNS_OUVERT_V4[@]}" > /etc/resolv.conf
+      else
+        install -m 0644 -o root -g root /etc/forceos/resolv.conf /etc/resolv.conf
+        for a in "${DNS_OUVERT_V4[@]}"; do nft delete element inet forceos dns_filtre_v4 "{ $a }" 2>/dev/null; done
+      fi ;;
+    assistant_ia)
+      if [[ $(valeur assistant_ia) == non ]]; then systemctl disable --now ollama.service >/dev/null 2>&1
+      else systemctl enable --now ollama.service >/dev/null 2>&1; fi ;;
+    mode_serveur)
+      [[ $(valeur mode_serveur) == non ]] && pkill -TERM -f '/usr/libexec/forceos/serveur-reseau' >/dev/null 2>&1 ;;
+    support_distance)
+      [[ $(valeur support_distance) == non ]] && /usr/libexec/forceos/support-fermer >/dev/null 2>&1 ;;
+    menu_demarrage)
+      if [[ $(valeur menu_demarrage) == oui ]]; then
+        printf '# ForceOS : menu de démarrage affiché (Réglages ForceOS)\nGRUB_TIMEOUT=5\nGRUB_TIMEOUT_STYLE=menu\n' > /etc/default/grub.d/60-forceos-options.cfg
+      else
+        rm -f /etc/default/grub.d/60-forceos-options.cfg
+      fi
+      [[ ${2:-} == demarrage ]] || update-grub >/dev/null 2>&1 ;;
+  esac
+  return 0
+}
+
+case ${1:-} in
+  definir)
+    [[ -n ${PKEXEC_UID:-} ]] || { echo "À lancer par Réglages ForceOS (pkexec)." >&2; exit 2; }
+    OPT=${2:-}; VAL=${3:-}
+    printf '%s\n' "${OPTIONS[@]}" | grep -qx -- "$OPT" || { echo "Option inconnue." >&2; exit 2; }
+    [[ $VAL == oui || $VAL == non ]] || { echo "Valeur invalide." >&2; exit 2; }
+    if grep -q "^$OPT=" "$FICHIER"; then sed -i "s/^$OPT=.*/$OPT=$VAL/" "$FICHIER"; else echo "$OPT=$VAL" >> "$FICHIER"; fi
+    chown root:root "$FICHIER"; chmod 0644 "$FICHIER"
+    appliquer "$OPT"
+    logger -t forceos-options "Option $OPT=$VAL (utilisateur $PKEXEC_UID)" ;;
+  appliquer)
+    [[ $EUID -eq 0 ]] || exit 2
+    for o in filtrage_dns assistant_ia menu_demarrage; do appliquer "$o" demarrage; done ;;
+  *) echo "Usage : options-racine definir <option> <oui|non> | appliquer" >&2; exit 2 ;;
+esac
+exit 0

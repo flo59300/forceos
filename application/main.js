@@ -484,6 +484,10 @@ ipcMain.handle('sauvegarde:restaurer', async (evt, demande) => {
  */
 function deconnecterSession() {
   modeServeur?.arreter('écran verrouillé');
+  // Option du poste (Réglages ForceOS) : déconnexion au verrouillage, active par défaut
+  try {
+    if (/^deconnexion_verrouillage=non$/m.test(fs.readFileSync(path.join(CONFIG_SYS, 'options.conf'), 'utf8'))) return;
+  } catch { /* fichier absent : comportement par défaut */ }
   cookies.vider();
   if (fenetre && !fenetre.isDestroyed() && origine) fenetre.loadURL(`${origine}/connexion`).catch(() => {});
 }

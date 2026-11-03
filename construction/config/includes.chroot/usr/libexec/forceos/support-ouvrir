@@ -9,6 +9,9 @@
 set -euo pipefail
 # shellcheck source=/dev/null
 . /etc/forceos/support.conf
+if grep -qx "support_distance=non" /etc/forceos/options.conf 2>/dev/null; then
+  echo "L'assistance à distance est désactivée dans « Réglages ForceOS »." >&2; exit 2
+fi
 [[ -n ${SERVEUR:-} && -n ${CLE:-} ]] || { echo "Le serveur d'assistance n'est pas configuré." >&2; exit 2; }
 [[ $SERVEUR =~ ^[A-Za-z0-9.:-]+$ && $CLE =~ ^[A-Za-z0-9+/=]+$ ]] || { echo "Configuration d'assistance invalide." >&2; exit 2; }
 DUREE=${DUREE_MAX_MINUTES:-120}

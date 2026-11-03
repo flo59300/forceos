@@ -32,3 +32,6 @@ chmod 0750 /var/lib/ollama
 # --- MariaDB : la base de démonstration et l'accès anonyme n'existent pas
 # sous Debian ; les droits des fichiers de configuration sont resserrés.
 chmod 0644 /etc/mysql/mariadb.conf.d/99-forceos.cnf
+
+# Options du poste (Réglages ForceOS) appliquées à chaque démarrage
+systemctl enable forceos-options.service

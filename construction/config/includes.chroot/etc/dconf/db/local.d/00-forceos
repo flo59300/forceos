@@ -34,7 +34,7 @@ picture-options='zoom'
 
 [org/cinnamon]
 panels-height=['1:40']
-favorite-apps=['forceos-fo-gestion.desktop', 'librewolf.desktop', 'org.gnome.Evince.desktop', 'libreoffice-writer.desktop', 'libreoffice-calc.desktop', 'nemo.desktop', 'forceos-guide.desktop', 'forceos-a-propos.desktop', 'cinnamon-settings.desktop']
+favorite-apps=['forceos-fo-gestion.desktop', 'librewolf.desktop', 'org.gnome.Evince.desktop', 'libreoffice-writer.desktop', 'libreoffice-calc.desktop', 'nemo.desktop', 'forceos-reglages.desktop', 'forceos-guide.desktop', 'forceos-a-propos.desktop', 'cinnamon-settings.desktop']
 
 [org/cinnamon/desktop/keybindings]
 custom-list=['custom0']

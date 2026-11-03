@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Réglages ForceOS
+Comment=Activer ou désactiver les options du poste
+Exec=forceos-reglages
+Icon=forceos-reglages
+Terminal=false
+Categories=Settings;

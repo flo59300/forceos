@@ -36,5 +36,7 @@ findmnt --poll=mount -n -r -o ACTION,TARGET 2>/dev/null | while read -r action c
   [[ $action == mount ]] || continue
   cible=$(printf '%b' "$cible")          # « \x20 » de la sortie brute : espaces
   [[ $cible == "$MEDIA"/* && -d $cible ]] || continue
+  # Option du compte (Réglages ForceOS), relue à chaque clé
+  grep -qx "analyse_usb=non" "$HOME/.config/forceos/options.conf" 2>/dev/null && continue
   analyser "$cible" &
 done

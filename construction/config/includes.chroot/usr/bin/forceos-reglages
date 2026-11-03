@@ -1,0 +1,231 @@
+#!/usr/bin/python3
+"""
+ForceOS : « Réglages ForceOS », les options du poste en un seul endroit
+Conçu et développé par Florian Bigotte pour Force Ouvrière
+
+Deux groupes d'interrupteurs :
+  - « Pour mon compte » : appliqués tout de suite, sans mot de passe
+    (fichier ~/.config/forceos/options.conf et réglages du bureau) ;
+  - « Pour tout le poste » : mot de passe administrateur demandé à chaque
+    changement (/usr/libexec/forceos/options-racine via pkexec).
+Si l'administrateur refuse ou annule, l'interrupteur reprend sa position.
+"""
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+import gi
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk, Gio, GLib, Gtk  # noqa: E402
+
+OPTIONS_POSTE = Path("/etc/forceos/options.conf")
+OPTIONS_COMPTE = Path.home() / ".config/forceos/options.conf"
+OUTIL = "/usr/libexec/forceos/options-racine"
+CLAVIER = "org.cinnamon.desktop.keybindings"
+
+COMPTE = [
+    ("analyse_usb", "Analyse automatique des clés USB",
+     "Chaque clé branchée est vérifiée par l'antivirus, en arrière-plan."),
+    ("rappel_sauvegarde", "Rappel de sauvegarde de FO Gestion",
+     "Une fenêtre le rappelle quand la dernière sauvegarde date de plus de 7 jours."),
+    ("raccourci_urgence", "Raccourci du verrouillage d'urgence",
+     "Ctrl + Alt + Pause verrouille l'écran et ferme FO Gestion et les documents."),
+]
+POSTE = [
+    ("deconnexion_verrouillage", "Déconnexion de FO Gestion au verrouillage",
+     "Poste partagé : chacun doit se reconnecter avec son compte après un verrouillage."),
+    ("filtrage_dns", "Filtrage des sites pour adultes",
+     "Bloque les sites pornographiques et impose la recherche protégée sur Google et Bing."),
+    ("assistant_ia", "Assistant IA local",
+     "Désactivé, il libère de la mémoire sur les PC modestes."),
+    ("mode_serveur", "Mode serveur pour les téléphones",
+     "Permet au secrétaire d'ouvrir FO Gestion aux téléphones du syndicat FO."),
+    ("support_distance", "Assistance à distance",
+     "Permet à Florian Bigotte de prendre la main, seulement quand le militant l'autorise."),
+    ("menu_demarrage", "Menu de démarrage visible",
+     "Utile pour un dépannage ; sinon ForceOS démarre directement."),
+]
+
+CSS = b"""
+window { background-color: #F4F6FB; }
+.bandeau { background-color: #002B7F; padding: 18px 24px; }
+.bandeau-titre { color: #FFFFFF; font-family: Carlito; font-size: 20pt; font-weight: bold; }
+.bandeau-texte { color: rgba(255,255,255,0.8); font-family: Carlito; font-size: 11.5pt; }
+.filet { background-color: #E2001A; min-height: 4px; }
+.groupe { color: #002B7F; font-family: Carlito; font-size: 14pt; font-weight: bold; margin-top: 8px; }
+.groupe-note { color: #46536A; font-family: Carlito; font-size: 10.5pt; }
+list { background-color: #FFFFFF; border: 1px solid #CFD7E6; border-radius: 12px; }
+row { padding: 10px 16px; border-bottom: 1px solid #EEF2F9; }
+.option-titre { color: #0E1726; font-family: Carlito; font-size: 12.5pt; font-weight: bold; }
+.option-texte { color: #46536A; font-family: Carlito; font-size: 10.5pt; }
+switch:checked { background-color: #002B7F; border-color: #001D57; }
+"""
+
+
+def lire(fichier: Path) -> dict:
+    valeurs = {}
+    try:
+        for ligne in fichier.read_text(encoding="utf-8").splitlines():
+            if "=" in ligne and not ligne.lstrip().startswith("#"):
+                cle, val = ligne.split("=", 1)
+                valeurs[cle.strip()] = val.strip()
+    except OSError:
+        pass
+    return valeurs
+
+
+def ecrire_compte(cle: str, actif: bool) -> None:
+    valeurs = lire(OPTIONS_COMPTE)
+    valeurs[cle] = "oui" if actif else "non"
+    OPTIONS_COMPTE.parent.mkdir(parents=True, exist_ok=True)
+    OPTIONS_COMPTE.write_text("".join(f"{k}={v}\n" for k, v in valeurs.items()), encoding="utf-8")
+
+
+def reglages_clavier():
+    """Réglages clavier de Cinnamon, ou None hors Cinnamon (schéma absent)."""
+    source = Gio.SettingsSchemaSource.get_default()
+    return Gio.Settings.new(CLAVIER) if source and source.lookup(CLAVIER, True) else None
+
+
+def raccourci_actif() -> bool:
+    reglages = reglages_clavier()
+    return reglages is None or "custom0" in list(reglages.get_strv("custom-list"))
+
+
+def definir_raccourci(actif: bool) -> None:
+    reglages = reglages_clavier()
+    if reglages is None:
+        raise RuntimeError("raccourcis du bureau Cinnamon introuvables")
+    liste = [x for x in reglages.get_strv("custom-list") if x != "custom0"]
+    reglages.set_strv("custom-list", (["custom0"] if actif else []) + liste)
+
+
+class Fenetre(Gtk.Window):
+    def __init__(self):
+        super().__init__(title="Réglages ForceOS")
+        self.set_default_size(720, 640)
+        self.set_position(Gtk.WindowPosition.CENTER)
+        self.set_icon_name("forceos-reglages")
+        boite = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.add(boite)
+
+        bandeau = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        bandeau.get_style_context().add_class("bandeau")
+        titre = Gtk.Label(label="Réglages ForceOS", xalign=0)
+        titre.get_style_context().add_class("bandeau-titre")
+        texte = Gtk.Label(label="Activez ou désactivez les options du poste. Tout est réversible.", xalign=0)
+        texte.get_style_context().add_class("bandeau-texte")
+        bandeau.pack_start(titre, False, False, 0)
+        bandeau.pack_start(texte, False, False, 0)
+        boite.pack_start(bandeau, False, False, 0)
+        filet = Gtk.Box()
+        filet.get_style_context().add_class("filet")
+        boite.pack_start(filet, False, False, 0)
+
+        defilement = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER)
+        boite.pack_start(defilement, True, True, 0)
+        contenu = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin=24)
+        defilement.add(contenu)
+
+        compte = lire(OPTIONS_COMPTE)
+        self.groupe(contenu, "Pour mon compte", "Appliqué tout de suite, sans mot de passe.",
+                    [(c, t, d, raccourci_actif() if c == "raccourci_urgence" else compte.get(c, "oui") != "non")
+                     for c, t, d in COMPTE], self.changer_compte)
+        poste = lire(OPTIONS_POSTE)
+        self.groupe(contenu, "Pour tout le poste", "Chaque changement demande le mot de passe administrateur.",
+                    [(c, t, d, poste.get(c, "non" if c == "menu_demarrage" else "oui") == "oui")
+                     for c, t, d in POSTE], self.changer_poste)
+
+        actions = Gtk.Box(spacing=10, margin_top=6)
+        for libelle, commande in (("Guide de démarrage", "forceos-guide"), ("À propos de ForceOS", "forceos-a-propos")):
+            b = Gtk.Button(label=libelle)
+            b.connect("clicked", lambda _b, c=commande: subprocess.Popen([c], start_new_session=True))
+            actions.pack_start(b, False, False, 0)
+        contenu.pack_start(actions, False, False, 0)
+
+    def groupe(self, contenu, titre, note, options, rappel):
+        t = Gtk.Label(label=titre, xalign=0)
+        t.get_style_context().add_class("groupe")
+        n = Gtk.Label(label=note, xalign=0)
+        n.get_style_context().add_class("groupe-note")
+        contenu.pack_start(t, False, False, 0)
+        contenu.pack_start(n, False, False, 0)
+        liste = Gtk.ListBox(selection_mode=Gtk.SelectionMode.NONE)
+        for cle, titre_option, description, actif in options:
+            ligne = Gtk.Box(spacing=16)
+            textes = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+            a = Gtk.Label(label=titre_option, xalign=0, wrap=True)
+            a.get_style_context().add_class("option-titre")
+            b = Gtk.Label(label=description, xalign=0, wrap=True, max_width_chars=60)
+            b.get_style_context().add_class("option-texte")
+            textes.pack_start(a, False, False, 0)
+            textes.pack_start(b, False, False, 0)
+            ligne.pack_start(textes, True, True, 0)
+            interrupteur = Gtk.Switch(active=actif, valign=Gtk.Align.CENTER)
+            interrupteur.connect("state-set", rappel, cle)
+            ligne.pack_end(interrupteur, False, False, 0)
+            liste.add(ligne)
+        contenu.pack_start(liste, False, False, 0)
+
+    def changer_compte(self, interrupteur, actif, cle):
+        try:
+            if cle == "raccourci_urgence":
+                definir_raccourci(actif)
+            else:
+                ecrire_compte(cle, actif)
+        except Exception as e:  # noqa: BLE001
+            self.erreur(f"Réglage non enregistré : {e}")
+            return True
+        return False
+
+    def changer_poste(self, interrupteur, actif, cle):
+        if getattr(interrupteur, "retour", False):   # retour à la position d'avant : rien à appliquer
+            interrupteur.retour = False
+            return False
+        interrupteur.set_sensitive(False)
+
+        def fini(processus, resultat):
+            interrupteur.set_sensitive(True)
+            try:
+                ok, _sortie, erreur = processus.communicate_utf8_finish(resultat)
+                code = processus.get_exit_status()
+            except GLib.Error:
+                ok, erreur, code = False, "", 1
+            if ok and code == 0:
+                interrupteur.set_state(actif)
+            else:
+                interrupteur.retour = True
+                interrupteur.set_active(not actif)
+                if code not in (126, 127):   # 126 ou 127 : mot de passe annulé ou refusé
+                    self.erreur((erreur or "").strip() or "Le réglage n'a pas pu être appliqué.")
+
+        processus = Gio.Subprocess.new(["pkexec", OUTIL, "definir", cle, "oui" if actif else "non"],
+                                       Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE)
+        processus.communicate_utf8_async(None, None, fini)
+        return True   # l'état final est posé quand l'administrateur a validé
+
+    def erreur(self, texte):
+        d = Gtk.MessageDialog(transient_for=self, modal=True, message_type=Gtk.MessageType.ERROR,
+                              buttons=Gtk.ButtonsType.OK, text="Réglages ForceOS", secondary_text=texte)
+        d.run()
+        d.destroy()
+
+
+def main():
+    fournisseur = Gtk.CssProvider()
+    fournisseur.load_from_data(CSS)
+    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), fournisseur,
+                                             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    if os.geteuid() == 0 and not os.environ.get("FORCEOS_ESSAI"):
+        sys.exit("À lancer depuis la session du militant, pas en administrateur.")
+    f = Fenetre()
+    f.connect("destroy", Gtk.main_quit)
+    f.show_all()
+    Gtk.main()
+
+
+if __name__ == "__main__":
+    main()

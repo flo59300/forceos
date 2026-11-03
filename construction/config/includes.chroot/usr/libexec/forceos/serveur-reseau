@@ -20,6 +20,9 @@ MODE=${1:-}; PORT=${2:-}; MINUTES=${3:-}
 [[ $MODE == wifi-pc || $MODE == wifi-existant ]] || { echo "Mode inconnu." >&2; exit 2; }
 [[ $PORT == 8443 ]] || { echo "Port non prévu." >&2; exit 2; }
 [[ $MINUTES =~ ^(30|60|120|240)$ ]] || { echo "Durée non prévue." >&2; exit 2; }
+if grep -qx "mode_serveur=non" /etc/forceos/options.conf 2>/dev/null; then
+  echo "Le mode serveur est désactivé dans « Réglages ForceOS »." >&2; exit 5
+fi
 CONNEXION=forceos-serveur
 MARQUE="forceos-serveur"
 IFACE=""

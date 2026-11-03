@@ -16,8 +16,9 @@ DELAI=7
 
 sleep 180   # laisser le temps d'ouvrir la session tranquillement
 while true; do
-  # FO Gestion configurée sur ce poste (clé de chiffrement créée) ?
-  if [[ -f $HOME/.config/ForceOS/cle-maitresse.enc ]]; then
+  # FO Gestion configurée sur ce poste et rappel non désactivé (Réglages ForceOS) ?
+  if [[ -f $HOME/.config/ForceOS/cle-maitresse.enc ]] \
+     && ! grep -qx "rappel_sauvegarde=non" "$HOME/.config/forceos/options.conf" 2>/dev/null; then
     jours=-1
     if [[ -s $REPERE ]] && derniere=$(date -d "$(head -1 "$REPERE")" +%s 2>/dev/null); then
       jours=$(( ($(date +%s) - derniere) / 86400 ))

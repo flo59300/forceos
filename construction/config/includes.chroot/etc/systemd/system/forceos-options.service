@@ -1,0 +1,12 @@
+# ForceOS : options du poste appliquées à chaque démarrage (Florian Bigotte)
+[Unit]
+Description=Options ForceOS (filtrage, assistant IA)
+After=nftables.service forceos-dns.service
+Wants=nftables.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/forceos/options-racine appliquer
+
+[Install]
+WantedBy=multi-user.target
