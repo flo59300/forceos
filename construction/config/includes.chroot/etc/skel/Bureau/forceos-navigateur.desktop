@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Navigateur web
+Comment=Naviguer sur Internet avec LibreWolf (filtré et effacé à la fermeture)
+Exec=librewolf %u
+Icon=librewolf
+Terminal=false
+Categories=Network;WebBrowser;

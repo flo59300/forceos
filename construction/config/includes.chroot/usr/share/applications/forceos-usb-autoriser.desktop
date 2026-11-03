@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Autoriser une clé USB
-Comment=Autoriser une clé USB bloquée (mot de passe administrateur)
-Exec=forceos-usb-autoriser
-Icon=forceos-usb
-Terminal=false
-Categories=System;Settings;

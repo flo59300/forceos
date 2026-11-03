@@ -1,6 +1,6 @@
 #!/bin/sh
 # =====================================================================
-# ForceOS : droits des outils système, polkit, clés USB
+# ForceOS : droits des outils système et polkit
 # Conçu et développé par Florian Bigotte pour Force Ouvrière
 # =====================================================================
 set -e
@@ -10,14 +10,17 @@ chown root:root /usr/libexec/forceos/*
 chmod 0755 /usr/libexec/forceos/* /usr/bin/forceos-*
 chmod 0644 /usr/share/polkit-1/actions/fr.force-ouvriere.forceos.policy
 chmod 0644 /etc/polkit-1/rules.d/49-forceos.rules
-chmod 0644 /etc/udev/rules.d/80-forceos-usb.rules
 
 # Configuration ForceOS lisible par tous, modifiable par root seulement
 chown -R root:root /etc/forceos
 find /etc/forceos -type d -exec chmod 0755 {} +
 find /etc/forceos -type f -exec chmod 0644 {} +
-touch /etc/forceos/usb-autorisees
-chmod 0644 /etc/forceos/usb-autorisees
+
+# Clés USB libres : l'ancien contrôle par liste d'autorisation est retiré
+# (utile pour un poste transformé par installer-forceos.sh)
+rm -f /etc/udev/rules.d/80-forceos-usb.rules /etc/forceos/usb-autorisees \
+      /usr/libexec/forceos/usb-autorisee /usr/libexec/forceos/usb-autoriser-racine \
+      /usr/bin/forceos-usb-autoriser /usr/share/applications/forceos-usb-autoriser.desktop
 
 # Les journaux du noyau ne sont pas lisibles par le militant
 echo 'kernel.dmesg_restrict = 1' > /etc/sysctl.d/40-forceos-dmesg.conf

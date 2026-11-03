@@ -121,26 +121,37 @@ async function attendreTrousseau(delaiMs = 8000) {
   } catch { /* absent : le contrôle ci-dessous le signalera */ }
   const fin = Date.now() + delaiMs;
   while (Date.now() < fin) {
-    const pret = typeof safeStorage.isAsyncEncryptionAvailable === 'function'
-      ? await safeStorage.isAsyncEncryptionAvailable().catch(() => false)
-      : safeStorage.isEncryptionAvailable();
+    const pret = await safeStorage.isAsyncEncryptionAvailable().catch(() => false);
     if (pret) return true;
     await new Promise((r) => setTimeout(r, 400));
   }
   return false;
 }
 
-function chargerCleMaitresse(dossier) {
-  if (!safeStorage.isEncryptionAvailable()) throw new Error('Le trousseau sécurisé du système est indisponible.');
+// API asynchrone de safeStorage uniquement : avec Electron 45, l'API synchrone
+// (dépréciée) peut se dire indisponible au premier lancement alors que le
+// trousseau répond déjà.
+async function chargerCleMaitresse(dossier) {
+  if (!(await safeStorage.isAsyncEncryptionAvailable())) throw new Error('Le trousseau sécurisé du système est indisponible.');
   const backend = safeStorage.getSelectedStorageBackend?.() ?? 'gnome_libsecret';
   if (backend === 'basic_text' || backend === 'unknown') {
     throw new Error(`Trousseau non sécurisé détecté (${backend}). Vérifiez que gnome-keyring est actif.`);
   }
   const fichier = path.join(dossier, 'cle-maitresse.enc');
-  if (fs.existsSync(fichier)) return safeStorage.decryptString(fs.readFileSync(fichier));
+  if (fs.existsSync(fichier)) {
+    const { result, shouldReEncrypt } = await safeStorage.decryptStringAsync(fs.readFileSync(fichier));
+    if (shouldReEncrypt) await ecrireCleMaitresse(fichier, result);
+    return result;
+  }
   const cle = crypto.randomBytes(32).toString('base64');
-  fs.writeFileSync(fichier, safeStorage.encryptString(cle), { mode: 0o600 });
+  await ecrireCleMaitresse(fichier, cle);
   return cle;
+}
+
+/** Écriture atomique de la clé maîtresse chiffrée par le trousseau. */
+async function ecrireCleMaitresse(fichier, cle) {
+  fs.writeFileSync(`${fichier}.tmp`, await safeStorage.encryptStringAsync(cle), { mode: 0o600 });
+  fs.renameSync(`${fichier}.tmp`, fichier);
 }
 
 /** Clé de chiffrement propre à CodeIgniter, dérivée de la clé maîtresse. */
@@ -409,9 +420,7 @@ ipcMain.handle('sauvegarde:restaurer', async (evt, demande) => {
     dossierTmp: path.join(dossierDonnees, 'tmp'),
     surCle: async (cle) => {
       // Adoption de la clé maîtresse de la sauvegarde, protégée par le trousseau de ce poste
-      const cible = path.join(dossierDonnees, 'cle-maitresse.enc');
-      fs.writeFileSync(`${cible}.tmp`, safeStorage.encryptString(cle), { mode: 0o600 });
-      fs.renameSync(`${cible}.tmp`, cible);
+      await ecrireCleMaitresse(path.join(dossierDonnees, 'cle-maitresse.enc'), cle);
     }
   });
   setTimeout(() => { app.relaunch(); app.quit(); }, 1500);
@@ -463,7 +472,7 @@ async function demarrer() {
   if (!(await attendreTrousseau())) {
     return erreurFatale('trousseau sécurisé', 'Le trousseau sécurisé du système est indisponible.\nFermez la session, rouvrez-la, puis relancez FO Gestion.');
   }
-  try { cle = chargerCleMaitresse(donnees); } catch (e) { return erreurFatale('trousseau sécurisé', e.message); }
+  try { cle = await chargerCleMaitresse(donnees); } catch (e) { return erreurFatale('trousseau sécurisé', e.message); }
 
   // 3. PHP, extensions, MariaDB
   const diag = await verifierPhp(PHP_BIN, PHP_INI, { accepterNonCorrige: PHP_NON_CORRIGE_ACCEPTE });

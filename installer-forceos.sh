@@ -77,7 +77,6 @@ cat <<TEXTE
    - bureau Cinnamon avec le thème Linux Mint aux couleurs FO et écran de connexion ForceOS ;
    - FO Gestion, l'IA locale et la transcription audio installées ;
    - navigateur LibreWolf verrouillé, filtrage DNS, pare-feu ;
-   - clés USB inconnues bloquées ;
    - le compte « ${MILITANT} » perd les droits administrateur (sudo) :
      seul le mot de passe root permettra d'administrer le poste.
 
@@ -96,8 +95,8 @@ read -r -p "  Tapez OUI pour continuer : " REPONSE </dev/tty
 if passwd -S root 2>/dev/null | awk '{exit !($2 == "L" || $2 == "NP")}'; then
   echo
   echo "  Ce PC n'a pas encore de mot de passe administrateur (root)."
-  echo "  Choisissez-le maintenant et notez-le : il servira pour autoriser les clés USB"
-  echo "  et modifier les consignes de l'IA."
+  echo "  Choisissez-le maintenant et notez-le : il servira pour les réglages réservés à l'administrateur,"
+  echo "  comme les consignes de l'IA."
   until passwd root </dev/tty; do echo "  Recommencez."; done
 fi
 

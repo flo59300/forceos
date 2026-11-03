@@ -42,7 +42,7 @@ Assistance : RustDesk n'est démarré que pendant une assistance acceptée par l
 
 Mises à jour : seules les mises à jour de sécurité Debian et LibreWolf, automatiques et invisibles. Il n'existe plus d'outil de mise à jour ForceOS par clé USB.
 
-Clés USB : seules les clés autorisées par l'administrateur (fabricant, modèle et numéro de série) sont lisibles ; claviers, souris, imprimantes et téléphones ne sont pas concernés. Une clé inconnue est bloquée par le noyau, puis autorisée en une fois par « Autoriser une clé USB » (menu Système, mot de passe administrateur). Pensez à autoriser les clés de sauvegarde de la section.
+Clés USB : toutes les clés et tous les disques USB sont lisibles, sans autorisation préalable ; l'antivirus est proposé au clic droit.
 
 Navigateur : LibreWolf verrouillé (configuration et extensions bloquées, DNS chiffré et proxy interdits, effacement à la fermeture), lancé sans Firejail ; filtrage DNS CleanBrowsing « Adult » et pare-feu qui bloque tout autre serveur DNS.
 

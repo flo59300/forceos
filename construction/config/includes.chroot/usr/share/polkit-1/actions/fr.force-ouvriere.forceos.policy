@@ -58,14 +58,4 @@
     </defaults>
     <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/ecrire-prompts</annotate>
   </action>
-  <action id="fr.force-ouvriere.forceos.usb">
-    <description>Autoriser une clé USB</description>
-    <message>L'autorisation d'une nouvelle clé USB demande le mot de passe administrateur.</message>
-    <defaults>
-      <allow_any>no</allow_any>
-      <allow_inactive>no</allow_inactive>
-      <allow_active>auth_admin</allow_active>
-    </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/usb-autoriser-racine</annotate>
-  </action>
 </policyconfig>

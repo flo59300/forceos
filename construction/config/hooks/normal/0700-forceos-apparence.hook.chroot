@@ -18,6 +18,15 @@ for t in Mint-Y Mint-Y-Blue Mint-Y-Dark-Blue ForceOS; do
   test -f "/usr/share/themes/$t/index.theme" || { echo "thème $t absent" >&2; exit 1; }
 done
 dconf update
+# Barre du bas : FO Gestion, navigateur, fichiers et traitement de texte épinglés
+# (valeur par défaut de l'applet Cinnamon, reprise par chaque nouveau compte)
+GWL=/usr/share/cinnamon/applets/grouped-window-list@cinnamon.org/settings-schema.json
+if [ -f "$GWL" ] && jq -e '."pinned-apps"' "$GWL" >/dev/null; then
+  jq '."pinned-apps".default = ["forceos-fo-gestion.desktop", "librewolf.desktop", "nemo.desktop", "libreoffice-writer.desktop"]' "$GWL" > "$GWL.tmp"
+  mv "$GWL.tmp" "$GWL"
+else
+  echo "applet grouped-window-list : réglage pinned-apps introuvable" >&2
+fi
 # Cinnamon devient la session par défaut ; l'ancien écran de connexion est retiré
 update-alternatives --set x-session-manager /usr/bin/cinnamon-session 2>/dev/null || true
 apt-get purge -y lightdm-gtk-greeter 2>/dev/null || true
