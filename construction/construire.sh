@@ -9,7 +9,7 @@
 # Étapes : vérification des prérequis, téléchargement vérifié des
 # composants hors Debian (mis en cache dans ./cache), compilation de
 # whisper.cpp, préparation du modèle d'IA, puis live-build.
-# Résultat : forceos-<version>-amd64.iso et son empreinte SHA-256.
+# Résultat : forceos-<version>-<date de construction>-amd64.iso et son empreinte SHA-256.
 # =====================================================================
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
@@ -59,6 +59,10 @@ etape "Paquet FO Gestion"
 rm -f "$PAQUETS"/forceos-fo-gestion_*.deb
 cp "$DEB_APP" "$PAQUETS/"
 printf '%s\n' "$FORCEOS_VERSION" > "$INC/etc/forceos/version"
+# Date de construction : dans le nom de l'image et sur le poste, pour savoir
+# avec certitude quelle image a servi à l'installation
+CONSTRUCTION=$(TZ=Europe/Paris date '+%Y%m%d-%H%M')
+printf 'ForceOS %s, image construite le %s\n' "$FORCEOS_VERSION" "$(TZ=Europe/Paris date '+%d/%m/%Y à %H:%M')" > "$INC/etc/forceos/construction"
 
 # --- 2. RustDesk -------------------------------------------------------------------
 etape "RustDesk $RUSTDESK_VERSION"
@@ -156,7 +160,7 @@ lb config
 lb build 2>&1 | tee "$RACINE/construction.log"
 ISO=$(ls -1 "$RACINE"/*.hybrid.iso 2>/dev/null | head -1)
 [[ -f $ISO ]] || erreur "aucune image produite : voir construction.log"
-FINAL=$RACINE/forceos-$FORCEOS_VERSION-amd64.iso
+FINAL=$RACINE/forceos-$FORCEOS_VERSION-$CONSTRUCTION-amd64.iso
 mv "$ISO" "$FINAL"
 ( cd "$RACINE" && sha256sum "$(basename "$FINAL")" > "$(basename "$FINAL").sha256" )
 etape "Terminé : $FINAL ($(du -h "$FINAL" | cut -f1))"

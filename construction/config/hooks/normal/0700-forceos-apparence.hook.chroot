@@ -31,6 +31,20 @@ fi
 update-alternatives --set x-session-manager /usr/bin/cinnamon-session 2>/dev/null || true
 apt-get purge -y lightdm-gtk-greeter 2>/dev/null || true
 
+# --- Dossier « Bureautique » prêt dans chaque nouveau compte -------------------
+# Copie des lanceurs installés ; premiere-session complète le dossier et lui
+# donne son icône au premier démarrage.
+mkdir -p /etc/skel/Bureau/Bureautique
+for id in libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-draw \
+          scribus org.gnome.Evince com.github.johnfactotum.Foliate \
+          com.github.jeromerobert.pdfarranger pdfarranger \
+          simple-scan org.gnome.SimpleScan org.gnome.Calculator \
+          thunderbird org.mozilla.Thunderbird; do
+  [ -f "/usr/share/applications/$id.desktop" ] || continue
+  install -m 0755 "/usr/share/applications/$id.desktop" "/etc/skel/Bureau/Bureautique/$id.desktop"
+done
+echo "Dossier Bureautique : $(ls /etc/skel/Bureau/Bureautique | tr '\n' ' ')"
+
 # --- Démarrage : thème Plymouth ForceOS (logo sur pastille blanche) ---------
 # La phrase de chiffrement du disque est saisie sur cet écran.
 if [ -d /usr/share/plymouth/themes/spinner ]; then
