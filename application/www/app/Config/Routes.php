@@ -284,10 +284,12 @@ $routes->group('interne', ['filter' => 'interne', 'namespace' => 'App\Controller
     $i->post('kb/rechercher', 'BaseDocumentaire::rechercher');
     $i->get('sauvegarde/export', 'Sauvegarde::exporter');
     $i->post('restauration/(debut|lot|fin|annuler)', 'Restauration::etape/$1');
+    $i->post('serveur/ticket', 'Serveur::ticket');
 });
 
 // ForceOS : sauvegarde chiffrée (secrétaire et trésorier)
 $routes->group('forceos', ['filter' => ['auth', 'role:secretaire,tresorier']], static function (RouteCollection $f) {
     $f->get('sauvegarde', 'Forceos::sauvegarde');
+    $f->get('serveur', 'Forceos::serveur');
     $f->post('ticket', 'Forceos::ticket');
 });

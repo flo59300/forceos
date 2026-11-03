@@ -15,6 +15,7 @@ const FORCEOS_TICKET_DUREE = 60;
 const FORCEOS_ROLES_TICKETS = [
     'export'       => ['secretaire', 'tresorier'],
     'restauration' => ['secretaire'],
+    'serveur'      => ['secretaire'],
 ];
 
 function forceos_dossier_tickets(): string

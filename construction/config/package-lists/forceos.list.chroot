@@ -37,6 +37,9 @@ gnome-system-monitor
 xdg-desktop-portal-gtk
 dconf-cli
 dbus-bin
+# Mode serveur de FO Gestion : certificat et point d'accès Wi-Fi
+openssl
+dnsmasq-base
 python3-gi
 gir1.2-gtk-3.0
 lightdm

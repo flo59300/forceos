@@ -17,6 +17,12 @@ function abonner(canal, rappel) {
 
 contextBridge.exposeInMainWorld('forceos', {
   infos: appeler('forceos:infos'),
+  serveur: {
+    demarrer: appeler('serveur:demarrer'),       // { ticket, mode, minutes }
+    arreter: appeler('serveur:arreter'),
+    etat: appeler('serveur:etat'),
+    surEtat: (rappel) => abonner('serveur:etat', rappel)
+  },
   sauvegarde: {
     exporter: appeler('sauvegarde:exporter'),     // { ticket, phrase }
     restaurer: appeler('sauvegarde:restaurer')    // { ticket, phrase }

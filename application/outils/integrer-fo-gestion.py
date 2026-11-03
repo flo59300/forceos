@@ -85,6 +85,7 @@ $routes->group('interne', ['filter' => 'interne', 'namespace' => 'App\\Controlle
     $i->post('kb/rechercher', 'BaseDocumentaire::rechercher');
     $i->get('sauvegarde/export', 'Sauvegarde::exporter');
     $i->post('restauration/(debut|lot|fin|annuler)', 'Restauration::etape/$1');
+    $i->post('serveur/ticket', 'Serveur::ticket');
 });
 """, encoding="utf-8")
 
@@ -150,6 +151,7 @@ $routes->group('interne', ['filter' => 'interne', 'namespace' => 'App\\Controlle
 // ForceOS : sauvegarde chiffrée (secrétaire et trésorier)
 $routes->group('forceos', ['filter' => ['auth', 'role:secretaire,tresorier']], static function (RouteCollection $f) {
     $f->get('sauvegarde', 'Forceos::sauvegarde');
+    $f->get('serveur', 'Forceos::serveur');
     $f->post('ticket', 'Forceos::ticket');
 });
 """, encoding="utf-8")
@@ -161,7 +163,8 @@ $routes->group('forceos', ['filter' => ['auth', 'role:secretaire,tresorier']], s
     remplacer(navigation,
               "                ['label' => 'Import et export', 'url' => '/administration/import', 'roles' => ['secretaire'], 'desc' => 'Fichiers CSV'],\n",
               "                ['label' => 'Import et export', 'url' => '/administration/import', 'roles' => ['secretaire'], 'desc' => 'Fichiers CSV'],\n"
-              "                ['label' => 'Sauvegarde chiffrée', 'url' => '/forceos/sauvegarde', 'roles' => ['secretaire', 'tresorier'], 'desc' => 'Sauvegarder ou restaurer toutes les données'],\n")
+              "                ['label' => 'Sauvegarde chiffrée', 'url' => '/forceos/sauvegarde', 'roles' => ['secretaire', 'tresorier'], 'desc' => 'Sauvegarder ou restaurer toutes les données'],\n"
+              "                ['label' => 'Mode serveur (téléphones)', 'url' => '/forceos/serveur', 'roles' => ['secretaire'], 'desc' => 'Ouvrir FO Gestion aux téléphones du syndicat'],\n")
 
     # 9. Apparence ForceOS : pictogrammes supplémentaires et feuille « verre »
     glyphes = {
@@ -188,6 +191,7 @@ $routes->group('forceos', ['filter' => ['auth', 'role:secretaire,tresorier']], s
         'user':     '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/>',
         'help':     '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6"/><path d="M12 17h.01"/>',
         'layers':   '<path d="m12 3 9 5-9 5-9-5Z"/><path d="m3 13 9 5 9-5"/>',
+        'wifi':     '<path d="M2.5 9a14 14 0 0 1 19 0"/><path d="M5.5 12.5a9.5 9.5 0 0 1 13 0"/><path d="M8.7 16a5 5 0 0 1 6.6 0"/><circle cx="12" cy="19.3" r="1.1"/>',
         'star':     '<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9Z"/>',
     }
     remplacer(www / "app/Helpers/fo_helper.php", "        $p = [\n",

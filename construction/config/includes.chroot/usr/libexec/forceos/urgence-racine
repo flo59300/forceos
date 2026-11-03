@@ -8,6 +8,8 @@ set -u
 logger -t forceos-urgence "Verrouillage d'urgence déclenché"
 # Coffre-fort refermé de force (les programmes qui l'utilisent sont arrêtés)
 /usr/libexec/forceos/coffre-racine fermer force >/dev/null 2>&1
+# Mode serveur des téléphones refermé (pare-feu et point d'accès Wi-Fi)
+pkill -TERM -f '/usr/libexec/forceos/serveur-reseau' >/dev/null 2>&1
 # Assistance à distance coupée
 /usr/libexec/forceos/support-fermer >/dev/null 2>&1
 # Caches de fichiers vidés : les documents lus récemment ne restent pas en mémoire

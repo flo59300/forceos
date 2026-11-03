@@ -26,6 +26,7 @@ const { verifierPhp, faillePhp2Shell } = require('./lib/php-check');
 const { appelInterne } = require('./lib/interne');
 const { creerMoteurPhp, BocalCookies } = require('./lib/moteur-php');
 const { exporterSauvegarde, restaurerSauvegarde } = require('./lib/sauvegarde');
+const { creerModeServeur } = require('./lib/serveur-reseau');
 const { enregistrerModules } = require('./lib/ipc-forceos');
 const { ouvrirPremiereConfiguration } = require('./lib/premiere-configuration');
 
@@ -66,6 +67,8 @@ const cookies = new BocalCookies();
 let jetonPhp = null;
 let jetonInterne = null;
 let origine = null;
+let contexteMoteur = null;
+let modeServeur = null;
 let fenetre = null;
 let arretEnCours = false;
 let synchroniserDocuments = async () => null;
@@ -179,10 +182,17 @@ async function attendreMariaDB(delaiMs = 15000) {
 // FO Gestion : moteur PHP sans port réseau (voir lib/moteur-php.js)
 // ---------------------------------------------------------------------
 function demarrerPhp({ cle, dossierDonnees }) {
+  contexteMoteur = { cle, dossierDonnees };
+  moteur = creerMoteurFO({ baseURL: `http://127.0.0.1:${portPhp}/`, port: portPhp });
+}
+
+/** Moteur PHP de FO Gestion pour une adresse donnée (fenêtre du PC, ou téléphones en mode serveur). */
+function creerMoteurFO({ baseURL, port, securise = false }) {
+  const { cle, dossierDonnees } = contexteMoteur;
   const utilisateur = os.userInfo().username;
   const opcache = path.join(dossierDonnees, 'opcache');
   fs.mkdirSync(opcache, { recursive: true, mode: 0o700 });
-  moteur = creerMoteurPhp({
+  return creerMoteurPhp({
     phpCgi: PHP_CGI,
     argsIni: [
       '-c', PHP_INI,
@@ -194,7 +204,7 @@ function demarrerPhp({ cle, dossierDonnees }) {
     ],
     docroot: DOCROOT,
     routeur: PHP_ROUTEUR,
-    port: portPhp,
+    port,
     journal: path.join(dossierDonnees, 'logs', 'php-serveur.log'),
     // Environnement reconstruit : rien n'est hérité de la session.
     environnement: {
@@ -207,7 +217,8 @@ function demarrerPhp({ cle, dossierDonnees }) {
       FORCEOS_OLLAMA: OLLAMA_URL,
       // Configuration de CodeIgniter 4, sans fichier .env
       CI_ENVIRONMENT: 'production',
-      'app.baseURL': `http://127.0.0.1:${portPhp}/`,
+      'app.baseURL': baseURL,
+      ...(securise ? { HTTPS: 'on' } : {}),
       'app.forceGlobalSecureRequests': 'false',
       'cookie.secure': 'false',
       'encryption.key': cleCodeIgniter(cle),
@@ -374,6 +385,28 @@ ipcMain.handle('forceos:infos', async (evt) => {
 
 const MOTIF_TICKET = /^[a-f0-9]{64}$/;
 
+// ---------------------------------------------------------------------
+// IPC : mode serveur pour les téléphones (secrétaire, mot de passe administrateur)
+// ---------------------------------------------------------------------
+const MINUTES_SERVEUR = new Set([30, 60, 120, 240]);
+ipcMain.handle('serveur:etat', async (evt) => {
+  if (!emetteurLegitime(evt)) throw new Error('Émetteur refusé.');
+  return modeServeur ? modeServeur.etat() : { actif: false };
+});
+ipcMain.handle('serveur:demarrer', async (evt, demande) => {
+  if (!emetteurLegitime(evt)) throw new Error('Émetteur refusé.');
+  const { ticket, mode, minutes } = demande ?? {};
+  if (typeof ticket !== 'string' || !MOTIF_TICKET.test(ticket)) throw new Error('Ticket invalide.');
+  if (!MINUTES_SERVEUR.has(minutes)) throw new Error('Durée non prévue.');
+  const r = await appel('/interne/serveur/ticket', { ticket });
+  if (!r?.ok) throw new Error('Vos droits ne permettent pas d’ouvrir le mode serveur.');
+  return modeServeur.demarrer({ mode, minutes });
+});
+ipcMain.handle('serveur:arreter', async (evt) => {
+  if (!emetteurLegitime(evt)) throw new Error('Émetteur refusé.');
+  return modeServeur.arreter('arrêt demandé');
+});
+
 /**
  * Date de la dernière sauvegarde réussie, lue par le rappel hebdomadaire de
  * ForceOS (forceos-rappel-sauvegarde) et par « À propos de ForceOS ».
@@ -450,6 +483,7 @@ ipcMain.handle('sauvegarde:restaurer', async (evt, demande) => {
  * suivante doit se reconnecter avec son propre compte.
  */
 function deconnecterSession() {
+  modeServeur?.arreter('écran verrouillé');
   cookies.vider();
   if (fenetre && !fenetre.isDestroyed() && origine) fenetre.loadURL(`${origine}/connexion`).catch(() => {});
 }
@@ -557,6 +591,15 @@ async function demarrer() {
 
   // 7. Fenêtre principale
   verrouillerSession();
+  modeServeur = creerModeServeur({
+    dossier: donnees,
+    jeton: jetonPhp,
+    csp: CSP,
+    modeTest: process.env.FORCEOS_SERVEUR_TEST === '1',
+    creerMoteur: (baseURL) => creerMoteurFO({ baseURL, port: Number(new URL(baseURL).port), securise: true }),
+    surChangement: (e) => { if (fenetre && !fenetre.isDestroyed()) fenetre.webContents.send('serveur:etat', e); }
+  });
+  app.on('will-quit', () => { modeServeur?.arreter('fermeture de FO Gestion'); });
   creerFenetre();
   surveillerVerrouillage();
   synchroniserDocuments();

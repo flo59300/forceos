@@ -31,6 +31,19 @@ final class Forceos extends BaseController
         ]);
     }
 
+    /** Mode serveur : FO Gestion servie aux téléphones sur le réseau local (secrétaire). */
+    public function serveur()
+    {
+        if (! $this->sousForceos()) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+        $role = (string) $this->auth->effectiveRole();
+        return $this->page('forceos/serveur', [
+            'title'     => 'Mode serveur pour les téléphones',
+            'autorise'  => in_array($role, FORCEOS_ROLES_TICKETS['serveur'], true),
+        ]);
+    }
+
     public function ticket()
     {
         $usage = (string) $this->request->getPost('usage');

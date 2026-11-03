@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : ouverture du réseau pour le mode serveur de FO Gestion
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+# Lancé par FO Gestion via pkexec (mot de passe administrateur) :
+#   serveur-reseau <wifi-pc|wifi-existant> <port> <minutes>
+#
+# wifi-pc       : le PC crée son propre point d'accès Wi-Fi (WPA2, mot de
+#                 passe tiré au hasard) ; les téléphones n'ont accès qu'au PC.
+# wifi-existant : le Wi-Fi ou le câble déjà utilisés, réseau privé seulement.
+#
+# Écrit une ligne JSON (adresse, réseau, mot de passe), puis reste actif
+# jusqu'à la fermeture de son entrée standard (arrêt par FO Gestion, ou
+# FO Gestion fermée) ou la fin de la durée. Tout est alors refermé :
+# règles du pare-feu retirées, point d'accès supprimé.
+# =====================================================================
+set -uo pipefail
+[[ -n ${PKEXEC_UID:-} ]] || { echo "À lancer par FO Gestion (pkexec)." >&2; exit 2; }
+MODE=${1:-}; PORT=${2:-}; MINUTES=${3:-}
+[[ $MODE == wifi-pc || $MODE == wifi-existant ]] || { echo "Mode inconnu." >&2; exit 2; }
+[[ $PORT == 8443 ]] || { echo "Port non prévu." >&2; exit 2; }
+[[ $MINUTES =~ ^(30|60|120|240)$ ]] || { echo "Durée non prévue." >&2; exit 2; }
+CONNEXION=forceos-serveur
+MARQUE="forceos-serveur"
+IFACE=""
+
+nettoyer() {
+  # Règles du pare-feu ajoutées par ce mode, retrouvées par leur commentaire
+  nft -a list chain inet forceos entree 2>/dev/null | awk -v m="$MARQUE" '$0 ~ m {print $NF}' |
+    while read -r h; do nft delete rule inet forceos entree handle "$h" 2>/dev/null; done
+  if [[ $MODE == wifi-pc ]]; then
+    nmcli connection down "$CONNEXION" >/dev/null 2>&1
+    nmcli connection delete "$CONNEXION" >/dev/null 2>&1
+  fi
+  logger -t forceos-serveur "Mode serveur fermé ($MODE${IFACE:+, $IFACE})"
+}
+trap nettoyer EXIT
+trap 'exit 0' TERM INT HUP
+
+prive() {  # adresse IPv4 d'un réseau privé (RFC 1918)
+  [[ $1 =~ ^10\. || $1 =~ ^192\.168\. || $1 =~ ^172\.(1[6-9]|2[0-9]|3[01])\. ]]
+}
+
+if [[ $MODE == wifi-pc ]]; then
+  IFACE=$(nmcli -t -f DEVICE,TYPE device status | awk -F: '$2 == "wifi" {print $1; exit}')
+  [[ -n $IFACE ]] || { echo "Aucune carte Wi-Fi sur ce PC." >&2; exit 3; }
+  SSID="ForceOS-FO-$(tr -dc 'A-Z0-9' < /dev/urandom | head -c 4)"
+  MDP=$(tr -dc 'abcdefghjkmnpqrstuvwxyz23456789' < /dev/urandom | head -c 12)
+  nmcli connection delete "$CONNEXION" >/dev/null 2>&1
+  if ! nmcli device wifi hotspot ifname "$IFACE" con-name "$CONNEXION" ssid "$SSID" password "$MDP" >/dev/null 2>&1; then
+    echo "La carte Wi-Fi de ce PC ne peut pas créer de point d'accès." >&2; exit 3
+  fi
+  for _ in $(seq 20); do
+    IP=$(nmcli -g IP4.ADDRESS device show "$IFACE" 2>/dev/null | head -1 | cut -d/ -f1)
+    [[ -n $IP ]] && break; sleep 1
+  done
+  # Attribution d'adresse (DHCP) et noms (DNS) du point d'accès, sur cette carte seulement
+  nft insert rule inet forceos entree iifname "$IFACE" udp dport '{ 53, 67 }' accept comment "\"$MARQUE\""
+  nft insert rule inet forceos entree iifname "$IFACE" tcp dport 53 accept comment "\"$MARQUE\""
+else
+  IFACE=$(ip -4 route show default | awk '{for (i = 1; i < NF; i++) if ($i == "dev") {print $(i + 1); exit}}')
+  [[ -n $IFACE ]] || { echo "Ce PC n'est connecté à aucun réseau." >&2; exit 3; }
+  IP=$(ip -4 -o addr show dev "$IFACE" | awk '{split($4, a, "/"); print a[1]; exit}')
+  SSID=""; MDP=""
+fi
+[[ ${IP:-} =~ ^[0-9]+(\.[0-9]+){3}$ ]] || { echo "Adresse réseau introuvable." >&2; exit 3; }
+prive "$IP" || { echo "Réseau public : le mode serveur n'est possible que sur un réseau privé." >&2; exit 3; }
+
+nft insert rule inet forceos entree iifname "$IFACE" ip daddr "$IP" tcp dport "$PORT" accept comment "\"$MARQUE\"" \
+  || { echo "Le pare-feu n'a pas pu être ouvert." >&2; exit 4; }
+logger -t forceos-serveur "Mode serveur ouvert ($MODE, $IFACE, $IP, $MINUTES min) par l'utilisateur $PKEXEC_UID"
+
+printf '{"ip":"%s","interface":"%s","ssid":"%s","motdepasse":"%s"}\n' "$IP" "$IFACE" "$SSID" "$MDP"
+# Attente : fin de l'entrée standard (FO Gestion) ou fin de la durée
+timeout "$((MINUTES * 60 + 30))" cat >/dev/null
+exit 0
