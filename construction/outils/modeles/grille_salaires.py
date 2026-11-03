@@ -145,7 +145,7 @@ doc = f'''<?xml version="1.0" encoding="UTF-8"?>
     <table:table-column table:style-name="colA"/>
     <table:table-column table:style-name="colN" table:number-columns-repeated="7"/>
     <table:table-row>{cel_texte("Grille de salaires : simulation d'augmentation", "Titre")}</table:table-row>
-    <table:table-row>{cel_texte("Section syndicale Force Ouvrière · cases jaunes à remplir, les autres se calculent seules", "Note")}</table:table-row>
+    <table:table-row>{cel_texte("Syndicat FO · cases jaunes à remplir, les autres se calculent seules", "Note")}</table:table-row>
     <table:table-row>{cel_texte("Augmentation générale négociée", "Libelle")}<table:table-cell table:style-name="Parametre" office:value-type="percentage" office:value="0.03"><text:p>3,00 %</text:p></table:table-cell></table:table-row>
     <table:table-row>{cel_texte("Nombre de mois de salaire par an", "Libelle")}<table:table-cell table:style-name="ParametreNombre" office:value-type="float" office:value="13"><text:p>13</text:p></table:table-cell></table:table-row>
     <table:table-row>{cel_texte("Valeurs d'exemple fictives : remplacez-les par les minima de la convention collective en vigueur et les salaires réels.", "Note")}</table:table-row>

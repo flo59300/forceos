@@ -18,14 +18,14 @@ LOGO = "/usr/share/icons/hicolor/128x128/apps/forceos.png"
 
 PAGES = [
     ("Bienvenue", None, "Bienvenue sur ForceOS",
-     "ForceOS est le poste de travail des militants Force Ouvrière. Tout ce dont la section a "
+     "ForceOS est le poste de travail des militants Force Ouvrière. Tout ce dont le syndicat FO a "
      "besoin est déjà installé, et les données restent sur ce PC, chiffrées.\n\n"
      "Ce guide présente l'essentiel en cinq étapes. Vous pourrez le rouvrir à tout moment "
      "depuis le menu, avec « Guide de démarrage ForceOS »."),
-    ("FO Gestion", "forceos-gestion", "FO Gestion, la gestion de la section",
+    ("FO Gestion", "forceos-gestion", "FO Gestion, la gestion du syndicat",
      "Double-cliquez sur l'icône « FO Gestion » du bureau. Elle fonctionne sans Internet : "
      "adhérents, cotisations, heures de délégation, agenda, élections.\n\n"
-     "Au tout premier lancement, l'application vous demande le nom de la section et votre "
+     "Au tout premier lancement, l'application vous demande le nom du syndicat et votre "
      "compte. Les écrans moins fréquents sont dans « Tout le reste ».\n\n"
      "L'assistant IA (accords, tracts, comptes rendus d'enregistrements) est dans FO Gestion, "
      "rubrique « Connaissances ». Il travaille sur ce PC, rien ne part sur Internet."),
@@ -38,7 +38,7 @@ PAGES = [
      "Complétez les passages en rouge.\n\n"
      "Les textes de référence vont dans « Bibliothèque syndicale », et les documents que "
      "l'assistant IA doit connaître dans « Documents de l'IA »."),
-    ("Sécurité", "forceos-verrouillage", "Protéger les données de la section",
+    ("Sécurité", "forceos-verrouillage", "Protéger les données du syndicat",
      "En cas de besoin, l'icône rouge « Verrouillage rapide » (ou Ctrl + Alt + Pause) verrouille "
      "l'écran, ferme FO Gestion et les documents, et referme le coffre-fort, en quelques secondes.\n\n"
      "Le « Coffre-fort FO » garde les documents les plus sensibles, protégés par sa propre phrase "

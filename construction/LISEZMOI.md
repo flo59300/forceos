@@ -24,7 +24,7 @@ Le script vérifie la machine, copie le paquet FO Gestion, télécharge RustDesk
 
 ## Installer un poste
 
-La clé démarre sur l'installateur Debian en français, préréglé. Restent posés volontairement : le disque à effacer, la phrase de chiffrement du disque, le mot de passe administrateur (root, que vous gardez) et le nom et mot de passe du militant. Le disque entier est chiffré (LUKS2 et LVM), sans partition d'échange sur disque. Le militant n'est pas administrateur. À la fin, son compte devient le seul autorisé à ouvrir FO Gestion, et sa base de données est créée au premier démarrage. Au premier lancement de FO Gestion, il saisit le nom de la section et crée son compte de secrétaire.
+La clé démarre sur l'installateur Debian en français, préréglé. Restent posés volontairement : le disque à effacer, la phrase de chiffrement du disque, le mot de passe administrateur (root, que vous gardez) et le nom et mot de passe du militant. Le disque entier est chiffré (LUKS2 et LVM), sans partition d'échange sur disque. Le militant n'est pas administrateur. À la fin, son compte devient le seul autorisé à ouvrir FO Gestion, et sa base de données est créée au premier démarrage. Au premier lancement de FO Gestion, il saisit le nom du syndicat et crée son compte de secrétaire.
 
 ## Ce que contient l'image
 

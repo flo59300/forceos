@@ -54,4 +54,8 @@ for f in "Lettre à la direction FO.odt" "Grille de salaires FO.ods"; do
 done
 
 install -m 0644 "Tract A5 Force Ouvrière.sla" "Lettre à la direction FO.odt" "Grille de salaires FO.ods" "$DEST/"
+
+# 5. Modèles Writer dérivés de la lettre (compte rendu, signalement, convocation, communiqué)
+rm -f "$DEST/Convocation à une réunion de section FO.odt"
+python3 -I "$ICI/modeles-fo.py" "$DEST"
 echo "Modèles prêts dans $DEST"

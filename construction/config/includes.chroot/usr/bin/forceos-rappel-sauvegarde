@@ -30,7 +30,7 @@ while true; do
       fi
       if zenity --question --width=480 --title="Sauvegarde de FO Gestion" \
            --ok-label="Ouvrir FO Gestion" --cancel-label="Plus tard" \
-           --text="<b>$texte</b>\n\nSi ce poste tombe en panne ou est perdu, les données de la section sont perdues avec lui.\n\nBranchez une clé USB, ouvrez FO Gestion, puis « Tout le reste » et « Sauvegarde chiffrée »." 2>/dev/null; then
+           --text="<b>$texte</b>\n\nSi ce poste tombe en panne ou est perdu, les données du syndicat sont perdues avec lui.\n\nBranchez une clé USB, ouvrez FO Gestion, puis « Tout le reste » et « Sauvegarde chiffrée »." 2>/dev/null; then
         "/opt/FO Gestion/forceos-fo-gestion" >/dev/null 2>&1 &
       fi
     fi

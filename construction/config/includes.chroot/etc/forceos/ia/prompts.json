@@ -16,12 +16,12 @@
     "accord": {
       "libelle": "Analyser un projet d'accord",
       "temperature": 0.3,
-      "consigne": "Analyse le projet d'accord d'entreprise fourni du point de vue des salariés et de la section FO. Structure ta réponse avec ces titres : Objet et périmètre de l'accord ; Avancées pour les salariés ; Reculs et points de vigilance ; Clauses floues ou ambiguës à faire préciser ; Points de droit à vérifier (conformité à la loi, à la convention collective de branche, durée, dénonciation, suivi) ; Questions à poser à la direction ; Pistes de contre-propositions. Termine par une appréciation d'ensemble, en rappelant que la décision de signer appartient à la section syndicale. Cite les articles ou paragraphes concernés du projet."
+      "consigne": "Analyse le projet d'accord d'entreprise fourni du point de vue des salariés et de la syndicat FO. Structure ta réponse avec ces titres : Objet et périmètre de l'accord ; Avancées pour les salariés ; Reculs et points de vigilance ; Clauses floues ou ambiguës à faire préciser ; Points de droit à vérifier (conformité à la loi, à la convention collective de branche, durée, dénonciation, suivi) ; Questions à poser à la direction ; Pistes de contre-propositions. Termine par une appréciation d'ensemble, en rappelant que la décision de signer appartient à la syndicat FO. Cite les articles ou paragraphes concernés du projet."
     },
     "tract": {
       "libelle": "Rédiger un communiqué / tract",
       "temperature": 0.7,
-      "consigne": "Rédige un tract ou un communiqué syndical FO à partir des éléments fournis. Structure : un titre court et percutant ; une accroche ; deux ou trois paragraphes brefs exposant les faits, la position de FO et les revendications ; un appel à l'action ou à la mobilisation ; la signature « La section syndicale Force Ouvrière ». Le ton est combatif mais factuel. Aucune attaque personnelle, aucun propos injurieux ou diffamatoire, aucune information confidentielle de l'entreprise. Le texte doit tenir sur une page A5."
+      "consigne": "Rédige un tract ou un communiqué syndical FO à partir des éléments fournis. Structure : un titre court et percutant ; une accroche ; deux ou trois paragraphes brefs exposant les faits, la position de FO et les revendications ; un appel à l'action ou à la mobilisation ; la signature « Le syndicat FO ». Le ton est combatif mais factuel. Aucune attaque personnelle, aucun propos injurieux ou diffamatoire, aucune information confidentielle de l'entreprise. Le texte doit tenir sur une page A5."
     },
     "prudhommes": {
       "libelle": "Aide Prud'hommes",
@@ -31,7 +31,7 @@
     "audio": {
       "libelle": "Compte rendu audio",
       "temperature": 0.3,
-      "consigne": "Le texte fourni est la transcription automatique d'un enregistrement (réunion, CSE, négociation, entretien). Elle peut contenir des erreurs de reconnaissance : corrige le sens sans inventer. Rédige un compte rendu structuré : Contexte et participants identifiables ; Sujets abordés ; Positions de la direction ; Positions et interventions des représentants du personnel ; Engagements pris et échéances ; Points restés en suspens ; Actions à mener par la section FO. Si une consigne particulière de l'utilisateur est fournie, elle prime sur cette structure."
+      "consigne": "Le texte fourni est la transcription automatique d'un enregistrement (réunion, CSE, négociation, entretien). Elle peut contenir des erreurs de reconnaissance : corrige le sens sans inventer. Rédige un compte rendu structuré : Contexte et participants identifiables ; Sujets abordés ; Positions de la direction ; Positions et interventions des représentants du personnel ; Engagements pris et échéances ; Points restés en suspens ; Actions à mener par la syndicat FO. Si une consigne particulière de l'utilisateur est fournie, elle prime sur cette structure."
     },
     "extraction": {
       "libelle": "Extraction (usage interne)",

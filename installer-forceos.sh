@@ -236,7 +236,7 @@ cat <<TEXTE
    Redémarrez l'ordinateur depuis le menu (ou : su -c reboot).
 
    À l'écran de connexion, entrez avec le compte « ${MILITANT} », puis
-   ouvrez FO Gestion depuis le bureau pour créer la section et le
+   ouvrez FO Gestion depuis le bureau pour créer le syndicat et le
    compte du secrétaire.
   ======================================================================
 

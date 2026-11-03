@@ -2,7 +2,7 @@
 
 Conçu et développé par Florian Bigotte pour Force Ouvrière.
 
-ForceOS est un poste de travail Debian 13 durci pour les sections Force Ouvrière : bureau Cinnamon avec le thème Linux Mint aux couleurs FO, FO Gestion en application de bureau qui fonctionne sans Internet, assistant IA local, transcription audio, coffre-fort chiffré, verrouillage d'urgence et assistance à distance encadrée.
+ForceOS est un poste de travail Debian 13 durci pour les syndicats FO : bureau Cinnamon avec le thème Linux Mint aux couleurs FO, FO Gestion en application de bureau qui fonctionne sans Internet, assistant IA local, transcription audio, coffre-fort chiffré, verrouillage d'urgence et assistance à distance encadrée.
 
 ## Installation automatique sur un PC sous Debian 13
 

@@ -29,10 +29,10 @@ def para(style: str, texte: str = "") -> str:
 
 def entete(destinataire: list[str] | None = None) -> list[str]:
     lignes = [
-        "<LOGO>Section syndicale Force Ouvrière",
+        "<LOGO>Syndicat FO",
         para("Standard", "Stellantis Valenciennes"),
         para("Standard", "Adresse du local syndical"),
-        para("Filet", "Téléphone · adresse e-mail de la section"),
+        para("Filet", "Téléphone · adresse e-mail du syndicat"),
     ]
     if destinataire:
         lignes.append(para("P1", destinataire[0]))
@@ -41,7 +41,7 @@ def entete(destinataire: list[str] | None = None) -> list[str]:
     return lignes
 
 
-PIED = para("Pied", "Section syndicale Force Ouvrière · Stellantis Valenciennes · Ensemble, + FOrts !")
+PIED = para("Pied", "Syndicat FO · Stellantis Valenciennes · Ensemble, + FOrts !")
 
 MODELES = {
     "Compte rendu de réunion CSE FO.odt": entete() + [
@@ -85,27 +85,27 @@ MODELES = {
                       "spécial des dangers graves et imminents. Je vous demande de procéder sans délai "
                       "à une enquête avec moi et de prendre les dispositions nécessaires pour y remédier."),
         para("Corps", "Je vous prie d'agréer, Monsieur le Directeur, l'expression de mes salutations distinguées."),
-        para("Signature", "Pour la section syndicale Force Ouvrière,"),
+        para("Signature", "Pour le syndicat FO,"),
         para("Droite", "[Prénom NOM]"),
         para("Droite", "[Mandat : membre du CSE, de la CSSCT]"),
         PIED,
     ],
-    "Convocation à une réunion de section FO.odt": entete() + [
+    "Convocation à une réunion du syndicat FO.odt": entete() + [
         para("Droite", "À Valenciennes, le [JJ mois AAAA]"),
-        para("Objet", "**Objet : **convocation à la réunion de la section Force Ouvrière"),
+        para("Objet", "**Objet : **convocation à la réunion du syndicat FO"),
         para("Standard"),
         para("Corps", "Chère adhérente, cher adhérent,"),
-        para("Corps", "Tu es invité(e) à la réunion de la section syndicale Force Ouvrière qui se tiendra le "
+        para("Corps", "Tu es invité(e) à la réunion du syndicat FO qui se tiendra le "
                       "**[jour JJ mois AAAA] à [HH:MM]**, **[lieu : local syndical, salle]**."),
         para("Corps", "**Ordre du jour :**"),
         para("Corps", "1. [Compte rendu du dernier CSE]"),
         para("Corps", "2. [Négociations en cours]"),
         para("Corps", "3. [Questions diverses]"),
-        para("Corps", "Ta présence compte : c'est ensemble que nous décidons des positions de la section. "
+        para("Corps", "Ta présence compte : c'est ensemble que nous décidons des positions du syndicat. "
                       "En cas d'empêchement, merci de prévenir [Prénom NOM, téléphone]."),
         para("Signature", "Syndicalement,"),
         para("Droite", "[Prénom NOM]"),
-        para("Droite", "[Secrétaire de la section]"),
+        para("Droite", "[Secrétaire du syndicat]"),
         PIED,
     ],
     "Communiqué aux salariés FO.odt": entete() + [

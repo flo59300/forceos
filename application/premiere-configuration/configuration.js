@@ -36,7 +36,7 @@
       if (faux) fautes.push(message);
     };
     const section = champ('section').value.trim();
-    marquer('section', section.length < 2, 'Indiquez le nom de la section.');
+    marquer('section', section.length < 2, 'Indiquez le nom du syndicat.');
     for (const n of ['tarif_timbre', 'tarif_carte']) {
       const v = montant(champ(n).value);
       marquer(n, !Number.isFinite(v) || v < 0 || v > 9999, 'Les tarifs doivent être des montants valides.');
@@ -78,7 +78,7 @@
     } catch (err) {
       afficher(String(err.message || err).replace(/^Error invoking remote method '[^']+': (Error: )?/, ''));
       bouton.disabled = false;
-      bouton.textContent = 'Créer la section et le compte';
+      bouton.textContent = 'Créer le syndicat et le compte';
     }
   });
 
