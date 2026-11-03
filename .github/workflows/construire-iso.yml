@@ -19,8 +19,8 @@ jobs:
     name: Paquet FO Gestion
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -31,7 +31,7 @@ jobs:
           npm ci
           npx electron-builder --linux deb --x64 --publish never
           ls -lh dist/*.deb
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: paquet-fo-gestion
           path: application/dist/*.deb
@@ -49,8 +49,8 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost /usr/share/swift
           sudo docker image prune --all --force >/dev/null
           df -h /
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           name: paquet-fo-gestion
           path: paquet
@@ -62,7 +62,7 @@ jobs:
             debian:trixie \
             bash -c "apt-get update -qq && apt-get install -y -qq ca-certificates curl netbase >/dev/null && ./construire.sh /w/$DEB"
           ls -lh construction/*.iso
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: forceos-iso
           path: |
@@ -72,7 +72,7 @@ jobs:
           compression-level: 0
       - name: Journal en cas d'échec
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: journal-construction
           path: construction/construction.log
