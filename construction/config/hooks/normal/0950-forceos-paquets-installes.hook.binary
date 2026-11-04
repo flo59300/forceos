@@ -1,0 +1,19 @@
+#!/bin/sh
+# =====================================================================
+# ForceOS : paquets à garder sur le poste installé
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# L'installateur retire du système copié les paquets qu'il croit propres à
+# la session autonome (fichier filesystem.packages-remove). LibreWolf, ajouté
+# par le crochet 0100 depuis son dépôt, y figurait : le navigateur disparaissait
+# du poste installé. Seuls les paquets de la session autonome restent listés.
+# =====================================================================
+set -e
+for f in live/filesystem.packages-remove binary/live/filesystem.packages-remove; do
+  [ -f "$f" ] || continue
+  grep -E '^(live-|debian-installer-launcher|calamares|user-setup)' "$f" > "$f.forceos" || true
+  echo "Paquets retirés à l'installation, avant : $(tr '\n' ' ' < "$f")"
+  echo "Paquets retirés à l'installation, après : $(tr '\n' ' ' < "$f.forceos")"
+  mv "$f.forceos" "$f"
+  ! grep -qx librewolf "$f" || { echo "LibreWolf encore dans $f" >&2; exit 1; }
+done

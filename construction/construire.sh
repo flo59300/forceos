@@ -165,6 +165,10 @@ etape "Construction de l'image (une à deux heures)"
 lb clean --purge >/dev/null 2>&1 || true
 lb config
 lb build 2>&1 | tee "$RACINE/construction.log"
+# Le poste installé doit garder le navigateur (voir le crochet 0950)
+if [[ -f binary/live/filesystem.packages-remove ]] && grep -qx librewolf binary/live/filesystem.packages-remove; then
+  erreur "LibreWolf serait retiré à l'installation : voir construction.log"
+fi
 ISO=$(ls -1 "$RACINE"/*.hybrid.iso 2>/dev/null | head -1)
 [[ -f $ISO ]] || erreur "aucune image produite : voir construction.log"
 FINAL=$RACINE/forceos-$FORCEOS_VERSION-$CONSTRUCTION-amd64.iso
