@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=ForceOS : dock
+Exec=plank
+OnlyShowIn=X-Cinnamon;
+NoDisplay=true
+X-GNOME-Autostart-Delay=2

@@ -36,6 +36,7 @@ gnome-screenshot
 gnome-system-monitor
 xdg-desktop-portal-gtk
 dconf-cli
+plank
 dbus-bin
 # Mode serveur de FO Gestion : certificat et point d'accès Wi-Fi
 openssl

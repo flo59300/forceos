@@ -68,5 +68,24 @@ cat >> "$DEST/ForceOS/cinnamon/cinnamon.css" <<'CSS'
 .panel-bottom { box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.10); }
 .menu, .popup-menu-boxpointer { border-radius: 10px; }
 .applet-box:hover, .applet-box:checked { background-color: rgba(255, 255, 255, 0.14); }
+
+/* Disposition « dock » : barre du haut fine, en verre bleu FO, sans trait */
+.panel-top {
+  background-color: rgba(0, 31, 92, 0.72);
+  box-shadow: none;
+  border: none;
+}
+.panel-top .applet-box { border-radius: 8px; margin: 2px 1px; }
+/* Menus et calendrier : grandes cartes arrondies, ombre douce */
+.menu, .popup-menu-boxpointer, .applet-menu, #menu-box { border-radius: 16px; }
+.popup-menu-item { border-radius: 8px; }
+.popup-menu-item:active, .popup-menu-item:hover { background-color: rgba(23, 73, 184, 0.85); color: #ffffff; }
+.menu-application-button-selected, .menu-category-button-selected {
+  background-color: rgba(23, 73, 184, 0.85); border-radius: 10px; color: #ffffff;
+}
+.menu-favorites-box { border-radius: 14px; }
+/* Bascule d'espace de travail et notifications aux couleurs FO */
+.workspace-button.selected { background-color: #e2001a; border-color: #e2001a; }
+.notification { border-radius: 14px; }
 CSS
 echo "Thème Mint compilé et installé dans $DEST"

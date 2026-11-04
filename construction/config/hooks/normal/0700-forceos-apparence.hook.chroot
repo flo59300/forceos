@@ -17,6 +17,35 @@ gtk-update-icon-cache -f -q /usr/share/icons/hicolor || true
 for t in Mint-Y Mint-Y-Blue Mint-Y-Dark-Blue ForceOS; do
   test -f "/usr/share/themes/$t/index.theme" || { echo "thème $t absent" >&2; exit 1; }
 done
+# --- Disposition « dock » : barre fine en haut, dock flottant centré en bas -----
+# Seulement si le dock (plank) est installé ; sinon la barre du bas classique
+# de Cinnamon reste en place.
+if [ -x /usr/bin/plank ] && [ -f /usr/share/plank/themes/ForceOS/dock.theme ]; then
+  cat > /etc/dconf/db/local.d/10-forceos-dock <<'DOCK'
+# ForceOS : disposition « dock » (Florian Bigotte), générée par le crochet 0700
+[org/cinnamon]
+panels-enabled=['1:0:top']
+panels-height=['1:30']
+enabled-applets=['panel1:left:0:menu@cinnamon.org:0', 'panel1:left:1:workspace-switcher@cinnamon.org:1', 'panel1:center:0:calendar@cinnamon.org:2', 'panel1:right:0:systray@cinnamon.org:3', 'panel1:right:1:xapp-status@cinnamon.org:4', 'panel1:right:2:notifications@cinnamon.org:5', 'panel1:right:3:removable-drives@cinnamon.org:6', 'panel1:right:4:keyboard@cinnamon.org:7', 'panel1:right:5:network@cinnamon.org:8', 'panel1:right:6:sound@cinnamon.org:9', 'panel1:right:7:power@cinnamon.org:10', 'panel1:right:8:user@cinnamon.org:11']
+
+[net/launchpad/plank/docks/dock1]
+theme='ForceOS'
+position='bottom'
+alignment='center'
+icon-size=46
+zoom-enabled=true
+zoom-percent=135
+hide-mode='window-dodge'
+pressure-reveal=false
+show-dock-item=false
+lock-items=false
+dock-items=['forceos-fo-gestion.dockitem', 'librewolf.dockitem', 'nemo.dockitem', 'libreoffice-writer.dockitem', 'libreoffice-calc.dockitem', 'thunderbird.dockitem', 'forceos-reglages.dockitem']
+DOCK
+else
+  rm -f /etc/xdg/autostart/forceos-dock.desktop
+  printf "[org/cinnamon]\npanels-height=['1:40']\n" > /etc/dconf/db/local.d/10-forceos-dock
+  echo "plank absent : barre du bas classique conservée" >&2
+fi
 dconf update
 # Barre du bas : FO Gestion, navigateur, fichiers et traitement de texte épinglés
 # (valeur par défaut de l'applet Cinnamon, reprise par chaque nouveau compte)

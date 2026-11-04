@@ -1,0 +1,36 @@
+# ForceOS : dock flottant aux couleurs Force Ouvrière (Florian Bigotte)
+# Verre bleu FO translucide, coins très arrondis, témoin rouge FO sous les
+# applications ouvertes.
+
+[PlankTheme]
+TopRoundness=18
+BottomRoundness=18
+LineWidth=1
+OuterStrokeColor=0;;20;;70;;150
+FillStartColor=23;;73;;184;;205
+FillEndColor=0;;31;;92;;215
+InnerStrokeColor=255;;255;;255;;55
+
+[PlankDockTheme]
+HorizPadding=10
+TopPadding=8
+BottomPadding=8
+ItemPadding=10
+IndicatorSize=5
+IconShadowSize=2
+UrgentBounceHeight=1.6666666666666667
+LaunchBounceHeight=0.625
+FadeOpacity=1
+ClickTime=300
+UrgentBounceTime=600
+LaunchBounceTime=600
+ActiveTime=300
+SlideTime=300
+FadeTime=250
+HideTime=150
+GlowSize=30
+GlowTime=10000
+GlowPulseTime=2000
+UrgentHueShift=150
+ItemMoveTime=350
+CascadeHide=true
