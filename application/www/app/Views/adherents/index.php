@@ -87,7 +87,7 @@ $back  = '/adherents' . ($filters ? '?' . http_build_query(array_filter($filters
 <h2 class="mt-8 text-xl" id="resultats"><?= $total ? esc(plural($total, 'adhérent')) : 'Aucun adhérent' ?><?= ($v('q') !== '' || $activeFilters) ? ' trouvé' . ($total > 1 ? 's' : '') : '' ?></h2>
 
 <?php if (! $rows): ?>
-<p class="card mt-3"><?= ($v('q') !== '' || $activeFilters) ? 'Aucun adhérent ne correspond. Essayez un autre nom ou retirez des filtres.' : 'Aucun adhérent pour le moment. Ajoutez le premier avec le bouton « Nouvel adhérent ».' ?></p>
+<div class="card fo-vide mt-3"><?= icon(($v('q') !== '' || $activeFilters) ? 'search' : 'users', 'size-8') ?><div><p class="m-0 text-lg font-bold"><?= ($v('q') !== '' || $activeFilters) ? 'Aucun adhérent ne correspond' : 'Aucun adhérent pour le moment' ?></p><p class="m-0 text-muted"><?= ($v('q') !== '' || $activeFilters) ? 'Essayez un autre nom ou retirez des filtres.' : 'Commencez par enregistrer le premier adhérent du syndicat FO.' ?></p><?php if ($v('q') === '' && ! $activeFilters): ?><a class="btn btn-primary mt-3" href="<?= site_url('adherents/nouveau') ?>"><?= icon('plus', 'size-5') ?> Ajouter le premier adhérent</a><?php endif ?></div></div>
 <?php else: ?>
 <form method="post" action="<?= site_url('adherents/groupe') ?>" id="form-groupe" x-data="{ n: 0, op: '' }" @change="n = $root.querySelectorAll('input[name=\'ids[]\']:checked').length">
     <?= csrf_field() ?>

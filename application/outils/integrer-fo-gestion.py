@@ -238,6 +238,18 @@ $routes->group('forceos', ['filter' => ['auth', 'role:secretaire,tresorier']], s
         if nouveau != texte:
             f.write_text(nouveau, encoding="utf-8")
 
+    # 11. Interface : feuille « verre » aussi sur les écrans simples (connexion),
+    #     état vide des adhérents avec son bouton
+    remplacer(www / "app/Views/layouts/simple.php",
+              "    <link rel=\"stylesheet\" href=\"<?= base_url('assets/app.css?v=' . FO_ASSET_VERSION) ?>\">\n",
+              "    <link rel=\"stylesheet\" href=\"<?= base_url('assets/app.css?v=' . FO_ASSET_VERSION) ?>\">\n"
+              "    <link rel=\"stylesheet\" href=\"<?= base_url('modules/forceos/verre.css?v=' . FO_ASSET_VERSION) ?>\">\n")
+    remplacer(www / "app/Views/adherents/index.php",
+              "<p class=\"card mt-3\"><?= ($v('q') !== '' || $activeFilters) ? 'Aucun adhérent ne correspond. Essayez un autre nom ou retirez des filtres.' : 'Aucun adhérent pour le moment. Ajoutez le premier avec le bouton « Nouvel adhérent ».' ?></p>",
+              "<div class=\"card fo-vide mt-3\"><?= icon(($v('q') !== '' || $activeFilters) ? 'search' : 'users', 'size-8') ?><div><p class=\"m-0 text-lg font-bold\"><?= ($v('q') !== '' || $activeFilters) ? 'Aucun adhérent ne correspond' : 'Aucun adhérent pour le moment' ?></p>"
+              "<p class=\"m-0 text-muted\"><?= ($v('q') !== '' || $activeFilters) ? 'Essayez un autre nom ou retirez des filtres.' : 'Commencez par enregistrer le premier adhérent du syndicat FO.' ?></p>"
+              "<?php if ($v('q') === '' && ! $activeFilters): ?><a class=\"btn btn-primary mt-3\" href=\"<?= site_url('adherents/nouveau') ?>\"><?= icon('plus', 'size-5') ?> Ajouter le premier adhérent</a><?php endif ?></div></div>")
+
     print(f"FO Gestion intégrée dans {www}")
 
 

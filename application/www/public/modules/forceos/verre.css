@@ -122,6 +122,62 @@ header.sticky, body > header {
   backdrop-filter: saturate(160%) blur(14px);
 }
 
+
+/* =====================================================================
+   Revue d'interface (ForceOS) : lisibilité, équilibre, états vides
+   ===================================================================== */
+
+/* Action principale : texte toujours blanc sur le bleu, y compris en mode sombre */
+.quick-action-main, .quick-action-main:hover { color: #fff; }
+@media (prefers-color-scheme: dark) {
+  .quick-action-main { background: linear-gradient(135deg, #2f6bea, #1749b8 55%, #0c2f86); }
+  .quick-action > svg { background: linear-gradient(160deg, #3a78f0, #1749b8); }
+}
+
+/* Actions rapides : deux colonnes égales sur grand écran (plus de carte orpheline) */
+@media (min-width: 48rem) {
+  ul:has(> li > .quick-action) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.quick-action { min-height: 4.75rem; }
+
+/* États vides : pictogramme, message clair et action */
+.fo-vide { display: flex; align-items: flex-start; gap: 1rem; padding-block: 1.5rem; }
+.fo-vide > div { flex: 1; min-width: 0; }
+.fo-vide > svg {
+  inline-size: 2rem; block-size: 2rem;
+  box-sizing: content-box; padding: .7rem; border-radius: 1rem; flex-shrink: 0;
+  color: var(--brand); background: var(--brand-soft);
+}
+
+/* Connexion : carte mise en avant, filet rouge FO, logo en verre */
+.card:has(> form[action$="/connexion"]) {
+  border-top: 4px solid var(--accent);
+  box-shadow: 0 2px 4px rgb(14 23 38 / .05), 0 24px 48px -24px rgb(0 43 127 / .45);
+}
+span.bg-\[\#002b7f\][aria-hidden="true"] {
+  background: linear-gradient(160deg, var(--verre-bleu-1), var(--verre-bleu-2));
+  box-shadow: var(--verre-ombre), inset 0 1px 0 rgb(255 255 255 / .5);
+}
+
+/* Champs : cible confortable au doigt (téléphones en mode serveur), focus bien visible */
+.input, select.input, .btn { min-height: 2.9rem; }
+.input:focus-visible, .btn:focus-visible, a:focus-visible {
+  outline: 3px solid var(--focus); outline-offset: 2px;
+}
+
+/* Titres de page : un peu plus d'air et un trait rouge FO discret */
+main h1 { letter-spacing: -.01em; }
+main h1::after {
+  content: ""; display: block; inline-size: 2.5rem; block-size: 3px; margin-top: .45rem;
+  border-radius: 2px; background: var(--accent);
+}
+.fo-entete h1::after { display: none; }
+
+/* Tableaux : lignes alternées et survol, en-têtes collants */
+table tbody tr:nth-child(even) { background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
+table tbody tr:hover { background: var(--brand-soft); }
+table thead th { position: sticky; top: 0; background: var(--surface); z-index: 1; }
+
 @media (prefers-reduced-motion: reduce) {
   .todo-card, .quick-action, .fo-carte .fo-fleche { transition: none; }
   a.todo-card:hover, .quick-action:hover, .fo-carte:hover .fo-fleche { transform: none; }

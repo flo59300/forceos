@@ -19,12 +19,18 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk, Gio, GLib, Gtk  # noqa: E402
+from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk  # noqa: E402
 
 OPTIONS_POSTE = Path("/etc/forceos/options.conf")
 OPTIONS_COMPTE = Path.home() / ".config/forceos/options.conf"
 OUTIL = "/usr/libexec/forceos/options-racine"
 CLAVIER = "org.cinnamon.desktop.keybindings"
+ICONES = "/usr/share/icons/hicolor/256x256/apps"
+PICTOS = {
+    "analyse_usb": "forceos-usb", "rappel_sauvegarde": "forceos-coffre", "raccourci_urgence": "forceos-verrouillage",
+    "deconnexion_verrouillage": "forceos-gestion", "filtrage_dns": "forceos-bouclier", "assistant_ia": "forceos-ia",
+    "mode_serveur": "forceos-wifi", "support_distance": "forceos-support", "menu_demarrage": "forceos-apropos",
+}
 
 COMPTE = [
     ("analyse_usb", "Analyse automatique des clés USB",
@@ -156,6 +162,13 @@ class Fenetre(Gtk.Window):
         liste = Gtk.ListBox(selection_mode=Gtk.SelectionMode.NONE)
         for cle, titre_option, description, actif in options:
             ligne = Gtk.Box(spacing=16)
+            try:
+                image = Gtk.Image.new_from_pixbuf(
+                    GdkPixbuf.Pixbuf.new_from_file_at_size(f"{ICONES}/{PICTOS.get(cle, 'forceos-reglages')}.png", 44, 44))
+                image.set_valign(Gtk.Align.CENTER)
+                ligne.pack_start(image, False, False, 0)
+            except GLib.Error:
+                pass
             textes = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
             a = Gtk.Label(label=titre_option, xalign=0, wrap=True)
             a.get_style_context().add_class("option-titre")

@@ -32,9 +32,6 @@ $base = legacy_url('');
         <p class="mt-1 text-lg text-muted">Les écrans moins fréquents, regroupés par thème.</p>
     </div>
 </header>
-<?php if (! $base): ?>
-<div class="alert alert-info mt-6" role="status"><p class="m-0">Ces écrans seront intégrés au hub au fil de la migration. L’adresse de la version actuelle n’est pas configurée.</p></div>
-<?php endif ?>
 <?php foreach ($groups as $name => $items): ?>
 <?php [$teinte, $pictoTheme] = $themes[$name] ?? ['bleu', 'grid']; ?>
 <section class="mt-10" aria-labelledby="g-<?= esc(url_title($name, '-', true), 'attr') ?>">

@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#002b7f">
     <title><?= esc($title ?? 'FO Gestion') ?> · <?= esc($appName ?? 'FO Gestion') ?></title>
     <link rel="stylesheet" href="<?= base_url('assets/app.css?v=' . FO_ASSET_VERSION) ?>">
+    <link rel="stylesheet" href="<?= base_url('modules/forceos/verre.css?v=' . FO_ASSET_VERSION) ?>">
     <link rel="icon" href="<?= base_url('assets/icon.svg') ?>" type="image/svg+xml">
 </head>
 <body class="min-h-dvh">

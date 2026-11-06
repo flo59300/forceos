@@ -55,6 +55,9 @@ const BASE           = 'forceos_gestion';
 const OLLAMA_URL     = 'http://127.0.0.1:11434';
 const CREDITS        = 'Conçu et développé par Florian Bigotte';
 
+// Dates, heures et nombres au format français dans les formulaires, quelle que
+// soit la langue de la session (sinon « mm/dd/yyyy » dans les champs de date)
+app.commandLine.appendSwitch('lang', 'fr-FR');
 // Hors de GNOME (Cinnamon), Chromium ne détecte pas toujours le trousseau et se rabat sur
 // un stockage en clair : libsecret est imposé (avant l'événement « ready »).
 app.commandLine.appendSwitch('password-store', 'gnome-libsecret');
