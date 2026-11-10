@@ -178,7 +178,65 @@ table tbody tr:nth-child(even) { background: color-mix(in srgb, var(--surface-2)
 table tbody tr:hover { background: var(--brand-soft); }
 table thead th { position: sticky; top: 0; background: var(--surface); z-index: 1; }
 
+
+/* =====================================================================
+   Revue d'interface, deuxième passe : états vides, téléphone, finitions
+   ===================================================================== */
+
+/* Tous les états vides (« Aucune tâche en cours », « Aucun paiement »...) :
+   pictogramme dans une pastille, texte posé, au lieu d'une ligne nue */
+p.card:not([class*="flex"]):not(.text-muted) {
+  display: flex; align-items: center; gap: 1rem; padding-block: 1.4rem;
+  color: var(--muted); font-size: 1.05rem;
+}
+p.card:not([class*="flex"]):not(.text-muted)::before {
+  content: ""; flex-shrink: 0; inline-size: 3rem; block-size: 3rem; border-radius: 1rem;
+  background-color: var(--brand-soft);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f6bea' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 13.5 6.5 5h11L20 13.5V18a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18z'/%3E%3Cpath d='M4 13.5h4.5l1 2h5l1-2H20'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: center; background-size: 1.6rem 1.6rem;
+}
+
+/* Boutons : relief léger, appui perceptible */
+.btn { transition: transform .12s ease, box-shadow .15s ease, background-color .15s ease, border-color .15s ease; }
+.btn-primary { box-shadow: 0 1px 0 rgb(255 255 255 / .18) inset, 0 6px 14px -8px rgb(0 43 127 / .7); }
+.btn:active { transform: translateY(1px) scale(.99); }
+
+/* Champs : bord bleu et halo doux à la saisie */
+.input { transition: border-color .15s ease, box-shadow .15s ease; }
+.input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 18%, transparent); }
+.input[aria-invalid="true"] { border-color: var(--danger); box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 15%, transparent); }
+
+/* Messages : barre latérale de couleur, coins arrondis */
+.alert { border-radius: .9rem; border-left-width: 5px; }
+
+/* Jauges arrondies et animées */
+.meter, .meter > span { border-radius: 999px; }
+.meter > span { transition: width .5s ease; }
+
+/* Arrivée des pages en douceur */
+@keyframes fo-arrivee { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+main > * { animation: fo-arrivee .28s ease both; }
+
+/* Sélection de texte et barres de défilement aux couleurs FO */
+::selection { background: color-mix(in srgb, var(--brand) 28%, transparent); }
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--brand) 45%, transparent) transparent; }
+
+/* --- Téléphone (mode serveur) ------------------------------------------ */
+@media (max-width: 40rem) {
+  /* Bilans chiffrés sur deux colonnes au lieu d'une longue liste */
+  dl.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Choix du mois sur une seule ligne : précédent, mois, suivant */
+  nav[aria-label="Choisir le mois"] { flex-wrap: nowrap; justify-content: space-between; gap: .4rem; }
+  nav[aria-label="Choisir le mois"] .btn { padding-inline: .7rem; font-size: .9rem; white-space: nowrap; }
+  nav[aria-label="Choisir le mois"] p { min-width: 0; font-size: 1.05rem; }
+  /* Titres un peu moins hauts, cartes pleine largeur */
+  main h1 { font-size: 1.6rem; }
+  .fo-vide { flex-direction: column; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  main > * { animation: none; }
+  .btn:active { transform: none; }
   .todo-card, .quick-action, .fo-carte .fo-fleche { transition: none; }
   a.todo-card:hover, .quick-action:hover, .fo-carte:hover .fo-fleche { transform: none; }
 }
