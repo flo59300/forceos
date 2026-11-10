@@ -54,6 +54,16 @@ case ${1:-} in
     logger -t forceos-options "Option $OPT=$VAL (utilisateur $PKEXEC_UID)" ;;
   appliquer)
     [[ $EUID -eq 0 ]] || exit 2
+    # Premier démarrage : sur un PC de moins de 6 Go de mémoire, l'assistant IA
+    # ralentirait tout le poste ; il est coupé d'office (réactivable dans Réglages)
+    if [[ ! -f /var/lib/forceos/memoire-verifiee ]]; then
+      mkdir -p /var/lib/forceos
+      if (( $(awk '/MemTotal/ {print int($2 / 1024)}' /proc/meminfo) < 5800 )); then
+        sed -i 's/^assistant_ia=.*/assistant_ia=non/' "$FICHIER"
+        logger -t forceos-options "Mémoire inférieure à 6 Go : assistant IA désactivé d'office"
+      fi
+      touch /var/lib/forceos/memoire-verifiee
+    fi
     for o in filtrage_dns assistant_ia menu_demarrage; do appliquer "$o" demarrage; done ;;
   *) echo "Usage : options-racine definir <option> <oui|non> | appliquer" >&2; exit 2 ;;
 esac

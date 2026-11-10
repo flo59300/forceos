@@ -1,0 +1,7 @@
+[Nemo Action]
+Name=Retirer les informations cachées
+Comment=Créer une copie sans auteur, historique ni position GPS, avant d'envoyer le document
+Exec=forceos-nettoyer-document %F
+Icon-Name=edit-clear-all-symbolic
+Selection=notnone
+Extensions=pdf;docx;odt;ods;odp;xlsx;pptx;jpg;jpeg;png;

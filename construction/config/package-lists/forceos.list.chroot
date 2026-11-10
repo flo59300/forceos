@@ -85,6 +85,11 @@ ffmpeg
 vlc
 simple-scan
 
+# --- Confidentialité des documents et mots de passe du syndicat ---
+mat2
+keepassxc
+upower
+
 # --- Courriel (en option sur le bureau, dossier Bureautique) ---
 thunderbird
 thunderbird-l10n-fr

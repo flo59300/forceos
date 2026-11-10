@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : retirer les informations cachées d'un document
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Auteur, nom du poste, historique des modifications, position GPS des
+# photos : tout ce qui peut trahir l'origine d'un tract ou d'une pièce.
+# L'original n'est pas modifié : une copie « .cleaned » est créée à côté.
+# =====================================================================
+set -u
+command -v mat2 >/dev/null || { zenity --error --text="L'outil de nettoyage n'est pas installé." 2>/dev/null; exit 1; }
+ok=0; refus=()
+for f in "$@"; do
+  [[ -f $f ]] || continue
+  if mat2 -- "$f" >/dev/null 2>&1; then ok=$((ok + 1)); else refus+=("$(basename "$f")"); fi
+done
+texte="<b>$ok document(s) nettoyé(s).</b>\nLa copie sans informations cachées porte « cleaned » dans son nom : c'est elle qu'il faut envoyer."
+(( ${#refus[@]} )) && texte+="\n\nNon pris en charge : $(printf '%s, ' "${refus[@]}" | sed 's/, $//;s/[&<>]/_/g')"
+zenity --info --width=460 --title="Informations cachées retirées" --text="$texte" 2>/dev/null

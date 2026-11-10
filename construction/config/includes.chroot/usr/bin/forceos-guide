@@ -56,8 +56,10 @@ PAGES = [
     ("Aide", "forceos-support", "En cas de souci",
      "L'icône « Contacter le support » permet à Florian Bigotte de voir votre écran pour vous "
      "aider, seulement si vous l'autorisez, et le temps de l'intervention.\n\n"
-     "« À propos de ForceOS », dans le menu, indique la version du poste et la date de la "
-     "dernière sauvegarde : c'est utile à communiquer lors d'une demande d'aide.\n\n"
+     "L'icône « Réglages ForceOS » regroupe les options du poste. On y trouve aussi le « Bilan de "
+     "santé », qui vérifie en une fois le disque, l'antivirus, la sauvegarde et la batterie, et "
+     "« Signaler un problème », qui prépare un fichier d'assistance à remettre à Florian.\n\n"
+     "Avant d'envoyer un document à l'extérieur : clic droit, « Retirer les informations cachées ».\n\n"
      "Bonne utilisation, et ensemble, + FOrts !"),
 ]
 

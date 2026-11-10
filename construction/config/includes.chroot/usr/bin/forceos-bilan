@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : bilan de santé du poste
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Vérifie en une fois les points qui protègent les données du syndicat :
+# disque, chiffrement, pare-feu, antivirus, correctifs, sauvegarde, batterie.
+#   forceos-bilan            fenêtre de résultat
+#   forceos-bilan --texte    même bilan en texte (pour « Signaler un problème »)
+# =====================================================================
+set -u
+LIGNES=()
+A_FAIRE=0
+point() {   # état (ok|faire|info), intitulé, détail
+  [[ $1 == faire ]] && A_FAIRE=$((A_FAIRE + 1))
+  LIGNES+=("$1" "$2" "$3")
+}
+jours_depuis() { echo $(( ($(date +%s) - $1) / 86400 )); }
+
+# Espace disque du dossier personnel
+read -r libre pourcent < <(df --output=avail,pcent -h "$HOME" | tail -1 | tr -d '%')
+if (( pourcent >= 90 )); then point faire "Espace disque" "Disque plein à $pourcent % ($libre libres) : supprimez ou archivez des fichiers"
+else point ok "Espace disque" "$libre libres (disque utilisé à $pourcent %)"; fi
+
+# Chiffrement du disque
+if grep -qw 'boot=live' /proc/cmdline; then point info "Chiffrement du disque" "Session de la clé USB : le chiffrement se met en place à l'installation"
+elif lsblk -rno TYPE 2>/dev/null | grep -qx crypt; then point ok "Chiffrement du disque" "Actif : le disque est illisible sans la phrase de chiffrement"
+else point faire "Chiffrement du disque" "Non détecté : prévenez Florian Bigotte"; fi
+
+# Pare-feu
+if systemctl is-active --quiet nftables 2>/dev/null; then point ok "Pare-feu" "Actif"
+else point faire "Pare-feu" "Arrêté : redémarrez le PC, puis prévenez Florian Bigotte si cela persiste"; fi
+
+# Filtrage des sites (option du poste)
+if grep -qx "filtrage_dns=non" /etc/forceos/options.conf 2>/dev/null; then point info "Filtrage des sites" "Désactivé dans Réglages ForceOS"
+else point ok "Filtrage des sites" "Actif"; fi
+
+# Base antivirale
+base=$(ls -t /var/lib/clamav/daily.c[lv]d 2>/dev/null | head -1)
+if [[ -z $base ]]; then point faire "Antivirus" "Base antivirale absente : connectez le PC à Internet"
+else
+  j=$(jours_depuis "$(stat -c %Y "$base")")
+  if (( j > 30 )); then point faire "Antivirus" "Base vieille de $j jours : connectez le PC à Internet pour la mettre à jour"
+  else point ok "Antivirus" "Base à jour (il y a $j jours)"; fi
+fi
+
+# Correctifs de sécurité
+repere=/var/lib/apt/periodic/update-success-stamp
+if [[ -f $repere ]]; then
+  j=$(jours_depuis "$(stat -c %Y "$repere")")
+  if (( j > 21 )); then point faire "Correctifs de sécurité" "Dernière vérification il y a $j jours : connectez le PC à Internet"
+  else point ok "Correctifs de sécurité" "Vérifiés il y a $j jours"; fi
+else point info "Correctifs de sécurité" "Pas encore vérifiés : ils le seront à la prochaine connexion à Internet"; fi
+
+# Sauvegarde de FO Gestion
+if [[ -f $HOME/.config/ForceOS/cle-maitresse.enc ]]; then
+  s=$HOME/.config/forceos/derniere-sauvegarde
+  if [[ -s $s ]] && d=$(date -d "$(head -1 "$s")" +%s 2>/dev/null); then
+    j=$(jours_depuis "$d")
+    if (( j >= 7 )); then point faire "Sauvegarde de FO Gestion" "Dernière sauvegarde il y a $j jours : faites-en une sur clé USB"
+    else point ok "Sauvegarde de FO Gestion" "Faite il y a $j jours"; fi
+  else point faire "Sauvegarde de FO Gestion" "Jamais faite : FO Gestion, Tout le reste, Sauvegarde chiffrée"; fi
+else point info "Sauvegarde de FO Gestion" "FO Gestion n'est pas encore configurée sur ce compte"; fi
+
+# Batterie
+bat=$(upower -e 2>/dev/null | grep -m1 BAT)
+if [[ -n $bat ]]; then
+  cap=$(upower -i "$bat" | awk '/capacity:/ {gsub(/[%,]/, "."); printf "%d", $2}')
+  if [[ -n $cap ]] && (( cap < 60 )); then point faire "Batterie" "Usée (capacité $cap %) : à remplacer pour travailler loin d'une prise"
+  elif [[ -n $cap ]]; then point ok "Batterie" "En bon état (capacité $cap %)"; fi
+fi
+
+# Mémoire et assistant IA
+mem=$(awk '/MemTotal/ {printf "%.1f", $2 / 1048576}' /proc/meminfo)
+if grep -qx "assistant_ia=non" /etc/forceos/options.conf 2>/dev/null; then point info "Assistant IA" "Désactivé (mémoire : $mem Go)"
+elif systemctl is-active --quiet ollama 2>/dev/null; then point ok "Assistant IA" "Actif (mémoire : $mem Go)"
+else point info "Assistant IA" "Moteur arrêté (mémoire : $mem Go)"; fi
+
+if [[ ${1:-} == --texte ]]; then
+  cat /etc/forceos/construction 2>/dev/null
+  for ((i = 0; i < ${#LIGNES[@]}; i += 3)); do printf '[%s] %s : %s\n' "${LIGNES[i]}" "${LIGNES[i+1]}" "${LIGNES[i+2]}"; done
+  exit 0
+fi
+
+AFFICHAGE=()
+for ((i = 0; i < ${#LIGNES[@]}; i += 3)); do
+  case ${LIGNES[i]} in ok) e="✔  Bon" ;; faire) e="⚠  À faire" ;; *) e="•  Info" ;; esac
+  AFFICHAGE+=("$e" "${LIGNES[i+1]}" "${LIGNES[i+2]}")
+done
+if (( A_FAIRE == 0 )); then resume="Tout va bien sur ce poste."
+elif (( A_FAIRE == 1 )); then resume="Un point demande votre attention."
+else resume="$A_FAIRE points demandent votre attention."; fi
+zenity --list --width=860 --height=470 --title="Bilan de santé ForceOS" --text="<b><big>$resume</big></b>" \
+  --column="État" --column="Point vérifié" --column="Résultat" --ok-label="Fermer" --hide-header=false \
+  "${AFFICHAGE[@]}" >/dev/null 2>&1
+exit 0

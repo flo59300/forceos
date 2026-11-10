@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Bilan de santé ForceOS
+Comment=Vérifier disque, chiffrement, antivirus, sauvegarde et batterie
+Exec=forceos-bilan
+Icon=forceos-bouclier
+Terminal=false
+Categories=System;

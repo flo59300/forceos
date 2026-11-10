@@ -55,7 +55,7 @@ for id in libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-dr
           scribus org.gnome.Evince com.github.johnfactotum.Foliate \
           com.github.jeromerobert.pdfarranger pdfarranger \
           simple-scan org.gnome.SimpleScan org.gnome.Calculator \
-          thunderbird org.mozilla.Thunderbird; do
+          thunderbird org.mozilla.Thunderbird org.keepassxc.KeePassXC; do
   src=/usr/share/applications/$id.desktop
   [[ -f $src && ! -e $BUREAUTIQUE/$id.desktop ]] || continue
   cp "$src" "$BUREAUTIQUE/"

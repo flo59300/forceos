@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# =====================================================================
+# ForceOS : « Signaler un problème »
+# Conçu et développé par Florian Bigotte pour Force Ouvrière
+#
+# Prépare sur le bureau une archive à remettre à Florian Bigotte : capture
+# de l'écran, version du poste, bilan de santé et derniers messages d'erreur
+# de la session. Rien n'est envoyé : le militant choisit comment la remettre
+# (clé USB, courriel). Aucune donnée d'adhérent n'y figure.
+# =====================================================================
+set -u
+zenity --question --width=480 --title="Signaler un problème" --ok-label="Préparer le signalement" --cancel-label="Annuler" \
+  --text="<b>Affichez d'abord à l'écran ce qui pose problème.</b>\n\nDans 5 secondes, ForceOS prendra une capture de l'écran, puis rangera sur le bureau un fichier à remettre à Florian Bigotte.\n\nIl contient la capture, la version du poste, le bilan de santé et les derniers messages d'erreur. Aucune donnée d'adhérent." 2>/dev/null || exit 0
+sleep 5
+NOM="Signalement-ForceOS-$(date +%Y%m%d-%H%M)"
+TRAVAIL=$(mktemp -d)
+D=$TRAVAIL/$NOM
+mkdir -p "$D"
+gnome-screenshot -f "$D/capture.png" >/dev/null 2>&1
+forceos-bilan --texte > "$D/bilan.txt" 2>&1
+{
+  echo "Date : $(date '+%d/%m/%Y %H:%M')"
+  echo "Compte : $USER"
+  echo "Noyau : $(uname -r)"
+  echo "Matériel : $(cat /sys/class/dmi/id/product_name 2>/dev/null)"
+  echo "FO Gestion : $(dpkg-query -W -f '${Version}' forceos-fo-gestion 2>/dev/null)"
+  echo "Écran : $(xrandr 2>/dev/null | awk '/\*/ {print $1; exit}')"
+} > "$D/poste.txt"
+journalctl --user -b -p warning --no-pager -n 300 > "$D/erreurs-session.txt" 2>/dev/null
+tail -n 60 "$HOME/.xsession-errors" > "$D/erreurs-bureau.txt" 2>/dev/null
+BUREAU=$(xdg-user-dir DESKTOP 2>/dev/null); [[ -d $BUREAU ]] || BUREAU=$HOME
+tar -C "$TRAVAIL" -czf "$BUREAU/$NOM.tar.gz" "$NOM"
+rm -rf "$TRAVAIL"
+zenity --info --width=460 --title="Signaler un problème" \
+  --text="<b>Le signalement est prêt sur le bureau :</b>\n$NOM.tar.gz\n\nRemettez ce fichier à Florian Bigotte (clé USB ou courriel), en expliquant en une phrase ce que vous faisiez." 2>/dev/null

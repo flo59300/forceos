@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Signaler un problème
+Comment=Préparer un fichier d'assistance pour Florian Bigotte
+Exec=forceos-signaler
+Icon=forceos-support
+Terminal=false
+Categories=System;

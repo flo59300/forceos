@@ -27,7 +27,7 @@ OUTIL = "/usr/libexec/forceos/options-racine"
 CLAVIER = "org.cinnamon.desktop.keybindings"
 ICONES = "/usr/share/icons/hicolor/256x256/apps"
 PICTOS = {
-    "analyse_usb": "forceos-usb", "rappel_sauvegarde": "forceos-coffre", "raccourci_urgence": "forceos-verrouillage",
+    "analyse_usb": "forceos-usb", "grand_affichage": "forceos-presentation", "rappel_sauvegarde": "forceos-coffre", "raccourci_urgence": "forceos-verrouillage",
     "deconnexion_verrouillage": "forceos-gestion", "filtrage_dns": "forceos-bouclier", "assistant_ia": "forceos-ia",
     "mode_serveur": "forceos-wifi", "support_distance": "forceos-support", "menu_demarrage": "forceos-apropos",
 }
@@ -37,6 +37,8 @@ COMPTE = [
      "Chaque clé branchée est vérifiée par l'antivirus, en arrière-plan."),
     ("rappel_sauvegarde", "Rappel de sauvegarde de FO Gestion",
      "Une fenêtre le rappelle quand la dernière sauvegarde date de plus de 7 jours."),
+    ("grand_affichage", "Grand affichage",
+     "Agrandit les textes et les menus de tout le bureau, pour lire plus confortablement."),
     ("raccourci_urgence", "Raccourci du verrouillage d'urgence",
      "Ctrl + Alt + Pause verrouille l'écran et ferme FO Gestion et les documents."),
 ]
@@ -96,6 +98,24 @@ def reglages_clavier():
     return Gio.Settings.new(CLAVIER) if source and source.lookup(CLAVIER, True) else None
 
 
+def reglages_interface():
+    source = Gio.SettingsSchemaSource.get_default()
+    schema = "org.cinnamon.desktop.interface"
+    return Gio.Settings.new(schema) if source and source.lookup(schema, True) else None
+
+
+def grand_affichage_actif() -> bool:
+    reglages = reglages_interface()
+    return reglages is not None and reglages.get_double("text-scaling-factor") > 1.05
+
+
+def definir_grand_affichage(actif: bool) -> None:
+    reglages = reglages_interface()
+    if reglages is None:
+        raise RuntimeError("réglages du bureau Cinnamon introuvables")
+    reglages.set_double("text-scaling-factor", 1.25 if actif else 1.0)
+
+
 def raccourci_actif() -> bool:
     reglages = reglages_clavier()
     return reglages is None or "custom0" in list(reglages.get_strv("custom-list"))
@@ -138,7 +158,8 @@ class Fenetre(Gtk.Window):
 
         compte = lire(OPTIONS_COMPTE)
         self.groupe(contenu, "Pour mon compte", "Appliqué tout de suite, sans mot de passe.",
-                    [(c, t, d, raccourci_actif() if c == "raccourci_urgence" else compte.get(c, "oui") != "non")
+                    [(c, t, d, raccourci_actif() if c == "raccourci_urgence" else
+                      grand_affichage_actif() if c == "grand_affichage" else compte.get(c, "oui") != "non")
                      for c, t, d in COMPTE], self.changer_compte)
         poste = lire(OPTIONS_POSTE)
         self.groupe(contenu, "Pour tout le poste", "Chaque changement demande le mot de passe administrateur.",
@@ -146,7 +167,8 @@ class Fenetre(Gtk.Window):
                      for c, t, d in POSTE], self.changer_poste)
 
         actions = Gtk.Box(spacing=10, margin_top=6)
-        for libelle, commande in (("Guide de démarrage", "forceos-guide"), ("À propos de ForceOS", "forceos-a-propos")):
+        for libelle, commande in (("Bilan de santé", "forceos-bilan"), ("Signaler un problème", "forceos-signaler"),
+                                  ("Guide de démarrage", "forceos-guide"), ("À propos", "forceos-a-propos")):
             b = Gtk.Button(label=libelle)
             b.connect("clicked", lambda _b, c=commande: subprocess.Popen([c], start_new_session=True))
             actions.pack_start(b, False, False, 0)
@@ -187,6 +209,8 @@ class Fenetre(Gtk.Window):
         try:
             if cle == "raccourci_urgence":
                 definir_raccourci(actif)
+            elif cle == "grand_affichage":
+                definir_grand_affichage(actif)
             else:
                 ecrire_compte(cle, actif)
         except Exception as e:  # noqa: BLE001
