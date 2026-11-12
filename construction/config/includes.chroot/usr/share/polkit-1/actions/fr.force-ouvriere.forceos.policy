@@ -58,16 +58,6 @@
     </defaults>
     <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/ecrire-prompts</annotate>
   </action>
-  <action id="fr.force-ouvriere.forceos.serveur">
-    <description>Ouvrir FO Gestion aux téléphones</description>
-    <message>L'ouverture du mode serveur de FO Gestion demande le mot de passe administrateur.</message>
-    <defaults>
-      <allow_any>no</allow_any>
-      <allow_inactive>no</allow_inactive>
-      <allow_active>auth_admin</allow_active>
-    </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/forceos/serveur-reseau</annotate>
-  </action>
   <action id="fr.force-ouvriere.forceos.options">
     <description>Modifier les options du poste ForceOS</description>
     <message>La modification des options du poste demande le mot de passe administrateur.</message>

@@ -11,7 +11,7 @@ $pictos = [
     '/administration' => 'cog', '/finances/tresorerie' => 'coins', '/administration/stock' => 'box',
     '/administration/rapport' => 'report', '/administration/utilisateurs' => 'usercog',
     '/administration/configuration' => 'sliders', '/administration/rappels' => 'alarm',
-    '/administration/import' => 'upload', '/forceos/sauvegarde' => 'lock', '/forceos/serveur' => 'wifi',
+    '/administration/import' => 'upload', '/forceos/sauvegarde' => 'lock',
     '/profil' => 'user', '/guide' => 'help',
     '/plateforme/sites' => 'layers', '/plateforme/comptes' => 'users', '/plateforme/reglages' => 'sliders',
     '/plateforme/sauvegardes' => 'download', '/plateforme/mises-a-jour' => 'shield',

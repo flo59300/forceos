@@ -29,7 +29,7 @@ ICONES = "/usr/share/icons/hicolor/256x256/apps"
 PICTOS = {
     "analyse_usb": "forceos-usb", "grand_affichage": "forceos-presentation", "rappel_sauvegarde": "forceos-coffre", "raccourci_urgence": "forceos-verrouillage",
     "deconnexion_verrouillage": "forceos-gestion", "filtrage_dns": "forceos-bouclier", "assistant_ia": "forceos-ia",
-    "mode_serveur": "forceos-wifi", "support_distance": "forceos-support", "menu_demarrage": "forceos-apropos",
+    "support_distance": "forceos-support", "menu_demarrage": "forceos-apropos",
 }
 
 COMPTE = [
@@ -49,8 +49,6 @@ POSTE = [
      "Bloque les sites pornographiques et impose la recherche protégée sur Google et Bing."),
     ("assistant_ia", "Assistant IA local",
      "Désactivé, il libère de la mémoire sur les PC modestes."),
-    ("mode_serveur", "Mode serveur pour les téléphones",
-     "Permet au secrétaire d'ouvrir FO Gestion aux téléphones du syndicat FO."),
     ("support_distance", "Assistance à distance",
      "Permet à Florian Bigotte de prendre la main, seulement quand le militant l'autorise."),
     ("menu_demarrage", "Menu de démarrage visible",

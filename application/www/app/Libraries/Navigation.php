@@ -124,7 +124,6 @@ class Navigation
                 ['label' => 'Rappels aux collecteurs', 'url' => '/administration/rappels', 'roles' => ['secretaire'], 'desc' => 'Courriels des retards'],
                 ['label' => 'Import et export', 'url' => '/administration/import', 'roles' => ['secretaire'], 'desc' => 'Fichiers CSV'],
                 ['label' => 'Sauvegarde chiffrée', 'url' => '/forceos/sauvegarde', 'roles' => ['secretaire', 'tresorier'], 'desc' => 'Sauvegarder ou restaurer toutes les données'],
-                ['label' => 'Mode serveur (téléphones)', 'url' => '/forceos/serveur', 'roles' => ['secretaire'], 'desc' => 'Ouvrir FO Gestion aux téléphones du syndicat'],
                 ['label' => 'Tarifs', 'url' => '/administration/configuration', 'roles' => ['tresorier'], 'desc' => 'Prix du timbre et de la carte'],
             ],
             'Mon compte' => [

@@ -159,7 +159,7 @@ span.bg-\[\#002b7f\][aria-hidden="true"] {
   box-shadow: var(--verre-ombre), inset 0 1px 0 rgb(255 255 255 / .5);
 }
 
-/* Champs : cible confortable au doigt (téléphones en mode serveur), focus bien visible */
+/* Champs : cible confortable au doigt, focus bien visible */
 .input, select.input, .btn { min-height: 2.9rem; }
 .input:focus-visible, .btn:focus-visible, a:focus-visible {
   outline: 3px solid var(--focus); outline-offset: 2px;
@@ -221,7 +221,7 @@ main > * { animation: fo-arrivee .28s ease both; }
 ::selection { background: color-mix(in srgb, var(--brand) 28%, transparent); }
 * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--brand) 45%, transparent) transparent; }
 
-/* --- Téléphone (mode serveur) ------------------------------------------ */
+/* --- Petits écrans ------------------------------------------ */
 @media (max-width: 40rem) {
   /* Bilans chiffrés sur deux colonnes au lieu d'une longue liste */
   dl.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -111,7 +111,7 @@ function creerMoteurPhp({ phpCgi, argsIni, environnement, docroot, routeur, port
     } catch { return null; }
   }
 
-  function variablesCgi({ methode, chemin, entetes, longueur, adresse }) {
+  function variablesCgi({ methode, chemin, entetes, longueur }) {
     const [, requete = ''] = chemin.split(/\?(.*)/s);
     const env = {
       ...environnement,
@@ -121,8 +121,7 @@ function creerMoteurPhp({ phpCgi, argsIni, environnement, docroot, routeur, port
       SERVER_NAME: '127.0.0.1',
       SERVER_ADDR: '127.0.0.1',
       SERVER_PORT: String(port),
-      // Adresse du client : celle du téléphone en mode serveur (limitation des essais)
-      REMOTE_ADDR: adresse || '127.0.0.1',
+      REMOTE_ADDR: '127.0.0.1',
       REMOTE_PORT: '0',
       REQUEST_METHOD: methode,
       REQUEST_URI: chemin,
@@ -148,7 +147,7 @@ function creerMoteurPhp({ phpCgi, argsIni, environnement, docroot, routeur, port
    * Exécute une requête.
    * @returns {Promise<{statut:number, entetes:Array<[string,string]>, flux:import('node:stream').Readable|null}>}
    */
-  async function requete({ methode = 'GET', chemin = '/', entetes = {}, corps = null, adresse = null }) {
+  async function requete({ methode = 'GET', chemin = '/', entetes = {}, corps = null }) {
     if (arrete) throw new Error('FO Gestion est en cours d’arrêt.');
     const p = chemin.split('?')[0] || '/';
     if (methode === 'GET' || methode === 'HEAD') {
@@ -170,7 +169,7 @@ function creerMoteurPhp({ phpCgi, argsIni, environnement, docroot, routeur, port
     try {
       const contenu = corps === null ? null : Buffer.isBuffer(corps) ? corps : Buffer.from(corps);
       const enfant = spawn(phpCgi, argsIni, {
-        env: variablesCgi({ methode, chemin, entetes, adresse, longueur: contenu ? contenu.length : (methode === 'POST' ? 0 : null) }),
+        env: variablesCgi({ methode, chemin, entetes, longueur: contenu ? contenu.length : (methode === 'POST' ? 0 : null) }),
         stdio: ['pipe', 'pipe', 'pipe']
       });
       enfants.add(enfant);

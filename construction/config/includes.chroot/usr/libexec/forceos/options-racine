@@ -8,7 +8,7 @@
 # =====================================================================
 set -uo pipefail
 FICHIER=/etc/forceos/options.conf
-OPTIONS=(filtrage_dns assistant_ia mode_serveur support_distance deconnexion_verrouillage menu_demarrage)
+OPTIONS=(filtrage_dns assistant_ia support_distance deconnexion_verrouillage menu_demarrage)
 DNS_OUVERT_V4=(9.9.9.9 149.112.112.112)   # Quad9 : résolveur sécurisé, sans filtrage des contenus
 
 valeur() { awk -F= -v k="$1" '$1 == k {v = $2} END {print (v == "" ? "oui" : v)}' "$FICHIER" 2>/dev/null; }
@@ -27,8 +27,6 @@ appliquer() {
     assistant_ia)
       if [[ $(valeur assistant_ia) == non ]]; then systemctl disable --now ollama.service >/dev/null 2>&1
       else systemctl enable --now ollama.service >/dev/null 2>&1; fi ;;
-    mode_serveur)
-      [[ $(valeur mode_serveur) == non ]] && pkill -TERM -f '/usr/libexec/forceos/serveur-reseau' >/dev/null 2>&1 ;;
     support_distance)
       [[ $(valeur support_distance) == non ]] && /usr/libexec/forceos/support-fermer >/dev/null 2>&1 ;;
     menu_demarrage)
