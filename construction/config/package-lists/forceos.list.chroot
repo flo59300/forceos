@@ -85,6 +85,10 @@ simple-scan
 # --- Confidentialité des documents et mots de passe du syndicat ---
 mat2
 keepassxc
+
+# --- Étiquettes, badges et cartes en série ; enregistrement des réunions ---
+glabels
+gnome-sound-recorder
 upower
 
 # --- Courriel (en option sur le bureau, dossier Bureautique) ---
